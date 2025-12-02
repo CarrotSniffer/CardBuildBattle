@@ -12,8 +12,11 @@ class Game {
             startingHandSize: 4,
             maxHandSize: 10,
             maxFieldUnits: 6,
-            maxMana: 10,
-            cardsPerTurn: 1
+            baseManaMax: 3,      // Natural mana cap without lands
+            maxMana: 10,         // Absolute maximum mana
+            cardsPerTurn: 1,
+            landCost: 1,         // Mana cost to play a land
+            landHealth: 3        // Default health for lands
         };
 
         // Initialize player states
@@ -36,14 +39,22 @@ class Game {
         return {
             id: playerId,
             health: this.config.startingHealth,
-            maxMana: 1,
+            baseMana: 1,        // Natural mana (increases each turn up to baseManaMax)
             currentMana: 1,
             deck: [],
             hand: [],
-            field: [], // Units on the battlefield
-            structures: [], // Structures on the field
+            field: [],          // Units on the battlefield
+            structures: [],     // Structures on the field
+            lands: [],          // Mana lands on the field
             graveyard: []
         };
+    }
+
+    // Calculate max mana based on base mana + lands
+    getMaxMana(playerId) {
+        const player = this.players[playerId];
+        const landBonus = player.lands.length;
+        return Math.min(this.config.maxMana, player.baseMana + landBonus);
     }
 
     initializeGame() {
@@ -310,6 +321,47 @@ class Game {
         return { success: true, message: `Built ${card.name}` };
     }
 
+    // Play a mana land
+    playLand(playerId) {
+        if (this.phase !== 'playing') {
+            return { success: false, message: 'Game has ended' };
+        }
+
+        if (this.currentTurn !== playerId) {
+            return { success: false, message: 'Not your turn' };
+        }
+
+        const player = this.players[playerId];
+
+        // Check if player has enough mana to play a land
+        if (player.currentMana < this.config.landCost) {
+            return { success: false, message: 'Not enough mana to play a land' };
+        }
+
+        // Spend mana and create land
+        player.currentMana -= this.config.landCost;
+
+        const land = {
+            instanceId: `${playerId}-land-${Date.now()}-${player.lands.length}`,
+            name: 'Mana Land',
+            health: this.config.landHealth,
+            currentHealth: this.config.landHealth
+        };
+
+        player.lands.push(land);
+
+        return { success: true, message: 'Mana Land played' };
+    }
+
+    // Destroy a land
+    destroyLand(ownerId, instanceId) {
+        const player = this.players[ownerId];
+        const idx = player.lands.findIndex(l => l.instanceId === instanceId);
+        if (idx !== -1) {
+            player.lands.splice(idx, 1);
+        }
+    }
+
     attack(playerId, attackerInstanceId, targetInfo) {
         if (this.currentTurn !== playerId) {
             return { success: false, message: 'Not your turn' };
@@ -375,6 +427,18 @@ class Game {
             if (target.currentHealth <= 0) {
                 const idx = opponentPlayer.structures.findIndex(s => s.instanceId === targetInfo.instanceId);
                 opponentPlayer.structures.splice(idx, 1);
+            }
+
+            attacker.canAttack = false;
+        } else if (targetInfo.type === 'land') {
+            const target = opponentPlayer.lands.find(l => l.instanceId === targetInfo.instanceId);
+            if (!target) {
+                return { success: false, message: 'Land not found' };
+            }
+
+            target.currentHealth -= damage;
+            if (target.currentHealth <= 0) {
+                this.destroyLand(opponent, targetInfo.instanceId);
             }
 
             attacker.canAttack = false;
@@ -469,9 +533,11 @@ class Game {
         // Start of turn for next player
         const nextPlayer = this.players[this.currentTurn];
 
-        // Increase max mana (up to 10)
-        nextPlayer.maxMana = Math.min(this.config.maxMana, nextPlayer.maxMana + 1);
-        nextPlayer.currentMana = nextPlayer.maxMana;
+        // Increase base mana (up to baseManaMax, typically 3)
+        nextPlayer.baseMana = Math.min(this.config.baseManaMax, nextPlayer.baseMana + 1);
+
+        // Refill mana to max (base + lands)
+        nextPlayer.currentMana = this.getMaxMana(this.currentTurn);
 
         // Draw a card
         this.drawCards(this.currentTurn, this.config.cardsPerTurn);
@@ -580,25 +646,30 @@ class Game {
             winner: this.winner,
             isYourTurn: this.currentTurn === playerId,
             turnNumber: this.turnNumber,
+            landCost: this.config.landCost,
             you: {
                 id: playerId,
                 health: playerState.health,
-                maxMana: playerState.maxMana,
+                baseMana: playerState.baseMana,
+                maxMana: this.getMaxMana(playerId),
                 currentMana: playerState.currentMana,
                 hand: playerState.hand,
                 field: playerState.field,
                 structures: playerState.structures,
+                lands: playerState.lands,
                 deckCount: playerState.deck.length,
                 graveyardCount: playerState.graveyard.length
             },
             opponent: {
                 id: opponent,
                 health: opponentState.health,
-                maxMana: opponentState.maxMana,
+                baseMana: opponentState.baseMana,
+                maxMana: this.getMaxMana(opponent),
                 currentMana: opponentState.currentMana,
                 handCount: opponentState.hand.length,
                 field: opponentState.field,
                 structures: opponentState.structures,
+                lands: opponentState.lands,
                 deckCount: opponentState.deck.length,
                 graveyardCount: opponentState.graveyard.length
             }

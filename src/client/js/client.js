@@ -154,6 +154,23 @@ class GameClient {
         // Game buttons
         document.getElementById('end-turn-btn').onclick = () => this.endTurn();
         document.getElementById('cancel-target-btn').onclick = () => this.cancelTargeting();
+        document.getElementById('play-land-btn').onclick = () => this.playLand();
+    }
+
+    // ===== Land Actions =====
+    playLand() {
+        if (!this.gameState.isYourTurn) {
+            this.showMessage('Not your turn!', true);
+            return;
+        }
+
+        const landCost = this.gameState.landCost || 1;
+        if (this.gameState.you.currentMana < landCost) {
+            this.showMessage('Not enough mana to play a land!', true);
+            return;
+        }
+
+        this.send({ type: 'play_land' });
     }
 
     // ===== Game Actions =====
@@ -250,6 +267,7 @@ class GameClient {
         document.getElementById('player-health').textContent = state.you.health;
         document.getElementById('player-mana').textContent = `${state.you.currentMana}/${state.you.maxMana}`;
         document.getElementById('player-deck').textContent = state.you.deckCount;
+        document.getElementById('player-lands-count').textContent = state.you.lands ? state.you.lands.length : 0;
 
         document.getElementById('opponent-health').textContent = state.opponent.health;
         document.getElementById('opponent-mana').textContent = `${state.opponent.currentMana}/${state.opponent.maxMana}`;
@@ -261,6 +279,12 @@ class GameClient {
         document.getElementById('turn-number').textContent = `Turn ${state.turnNumber}`;
         document.getElementById('end-turn-btn').disabled = !state.isYourTurn;
 
+        // Update play land button
+        const landCost = state.landCost || 1;
+        const playLandBtn = document.getElementById('play-land-btn');
+        playLandBtn.disabled = !state.isYourTurn || state.you.currentMana < landCost;
+        playLandBtn.title = `Play a Mana Land (Cost: ${landCost})`;
+
         // Render hands
         this.renderHand(state.you.hand);
 
@@ -271,6 +295,10 @@ class GameClient {
         // Render structures
         this.renderStructures('player-structures', state.you.structures);
         this.renderStructures('opponent-structures', state.opponent.structures);
+
+        // Render lands
+        this.renderLands('player-lands', state.you.lands || [], true);
+        this.renderLands('opponent-lands', state.opponent.lands || [], false);
 
         // Check for game end
         if (state.phase === 'ended') {
@@ -320,6 +348,42 @@ class GameClient {
             const cardEl = this.createStructureElement(structure);
             container.appendChild(cardEl);
         });
+    }
+
+    renderLands(containerId, lands, isPlayer) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+
+        lands.forEach(land => {
+            const landEl = this.createLandElement(land, isPlayer);
+            container.appendChild(landEl);
+        });
+    }
+
+    createLandElement(land, isPlayer) {
+        const el = document.createElement('div');
+        el.className = 'land-card';
+        el.dataset.instanceId = land.instanceId;
+
+        const healthClass = land.currentHealth < land.health ? 'damaged' : '';
+
+        // Enemy lands can be targeted when in attack mode
+        if (!isPlayer && this.targetMode === 'attack') {
+            el.classList.add('targetable');
+            el.onclick = () => this.selectTarget({
+                type: 'land',
+                playerId: this.gameState.opponent.id,
+                instanceId: land.instanceId
+            });
+        }
+
+        el.innerHTML = `
+            <div class="land-icon">🏔️</div>
+            <div class="land-name">${land.name}</div>
+            <div class="land-health ${healthClass}">♥${land.currentHealth}</div>
+        `;
+
+        return el;
     }
 
     createCardElement(card, inHand = false) {
@@ -422,8 +486,10 @@ class GameClient {
     highlightAttackTargets() {
         const opponentUnits = document.querySelectorAll('#opponent-field .field-unit');
         const heroTarget = document.querySelector('#opponent-field .hero-target');
+        const opponentLands = document.querySelectorAll('#opponent-lands .land-card');
 
         opponentUnits.forEach(u => u.classList.add('targetable'));
+        opponentLands.forEach(l => l.classList.add('targetable'));
         if (heroTarget) heroTarget.classList.add('targetable');
     }
 

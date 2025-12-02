@@ -32,6 +32,22 @@ class GameManager {
         return game.playCard(playerId, cardId, target);
     }
 
+    playLand(gameId, playerId) {
+        const game = this.games.get(gameId);
+        if (!game) {
+            return { success: false, message: 'Game not found' };
+        }
+        return game.playLand(playerId);
+    }
+
+    attack(gameId, playerId, attackerId, target) {
+        const game = this.games.get(gameId);
+        if (!game) {
+            return { success: false, message: 'Game not found' };
+        }
+        return game.attack(playerId, attackerId, target);
+    }
+
     endTurn(gameId, playerId) {
         const game = this.games.get(gameId);
         if (!game) {

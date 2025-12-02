@@ -311,6 +311,28 @@ function handleMessage(playerId, data) {
             }
             break;
 
+        case 'play_land':
+            if (player.gameId) {
+                const result = gameManager.playLand(player.gameId, playerId);
+                if (result.success) {
+                    broadcastGameState(player.gameId);
+                } else {
+                    sendToPlayer(playerId, { type: 'error', message: result.message });
+                }
+            }
+            break;
+
+        case 'attack':
+            if (player.gameId) {
+                const result = gameManager.attack(player.gameId, playerId, data.attackerId, data.target);
+                if (result.success) {
+                    broadcastGameState(player.gameId);
+                } else {
+                    sendToPlayer(playerId, { type: 'error', message: result.message });
+                }
+            }
+            break;
+
         case 'end_turn':
             if (player.gameId) {
                 const result = gameManager.endTurn(player.gameId, playerId);

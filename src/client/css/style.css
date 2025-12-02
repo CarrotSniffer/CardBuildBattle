@@ -493,6 +493,90 @@ body {
     animation: pulse 1s infinite;
 }
 
+/* Lands Row */
+.lands-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 60px;
+    padding: 0.5rem;
+    background: rgba(0, 100, 0, 0.15);
+    border-radius: 8px;
+}
+
+/* Land Cards */
+.land-card {
+    width: 60px;
+    height: 50px;
+    background: linear-gradient(135deg, #2d5016 0%, #1a3a0a 100%);
+    border: 2px solid #4a7c23;
+    border-radius: 6px;
+    padding: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    transition: all 0.2s ease;
+}
+
+.land-card.targetable {
+    border-color: var(--warning-color);
+    animation: pulse 1s infinite;
+    cursor: pointer;
+}
+
+.land-icon {
+    font-size: 1.2rem;
+}
+
+.land-name {
+    font-size: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.land-health {
+    font-size: 0.7rem;
+    color: var(--health-color);
+    font-weight: bold;
+}
+
+.land-health.damaged {
+    color: #ff6b6b;
+}
+
+/* Lands Display in Player Info */
+.lands-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.lands-icon {
+    font-size: 1rem;
+}
+
+/* Play Land Button */
+.btn-land {
+    background: linear-gradient(135deg, #2d5016 0%, #4a7c23 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    min-width: auto;
+}
+
+.btn-land:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(74, 124, 35, 0.4);
+}
+
+.btn-land:disabled {
+    background: #333;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
 /* Deck Selector */
 .deck-selector {
     padding: 0.75rem 1rem;
