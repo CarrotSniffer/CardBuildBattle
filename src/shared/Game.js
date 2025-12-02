@@ -12,8 +12,8 @@ class Game {
             startingHandSize: 4,
             maxHandSize: 10,
             maxFieldUnits: 6,
-            baseManaMax: 3,      // Natural mana cap without lands
-            maxMana: 10,         // Absolute maximum mana
+            baseManaMax: 5,      // Natural mana cap without lands
+            maxMana: 12,         // Absolute maximum mana (5 base + 7 lands)
             cardsPerTurn: 1,
             landCost: 1,         // Mana cost to play a land
             landHealth: 3        // Default health for lands
@@ -36,6 +36,17 @@ class Game {
     }
 
     createPlayerState(playerId) {
+        // Create 7 starting lands for each player
+        const startingLands = [];
+        for (let i = 0; i < 7; i++) {
+            startingLands.push({
+                instanceId: `${playerId}-land-start-${i}`,
+                name: 'Mana Land',
+                health: this.config.landHealth,
+                currentHealth: this.config.landHealth
+            });
+        }
+
         return {
             id: playerId,
             health: this.config.startingHealth,
@@ -45,7 +56,7 @@ class Game {
             hand: [],
             field: [],          // Units on the battlefield
             structures: [],     // Structures on the field
-            lands: [],          // Mana lands on the field
+            lands: startingLands,  // Start with 7 mana lands
             graveyard: []
         };
     }

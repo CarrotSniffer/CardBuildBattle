@@ -87,6 +87,11 @@ const cardOps = {
         SELECT * FROM cards WHERE id = ?
     `),
 
+    findDuplicate: db.prepare(`
+        SELECT * FROM cards
+        WHERE user_id = ? AND attack = ? AND health = ? AND mana_cost = ? AND traits = ?
+    `),
+
     update: db.prepare(`
         UPDATE cards
         SET name = ?, attack = ?, health = ?, mana_cost = ?, traits = ?, point_total = ?
@@ -160,6 +165,19 @@ function createCard(userId, cardData) {
         cardData.pointTotal
     );
     return { id, ...cardData, traits: cardData.traits || [] };
+}
+
+// Check if a card with same stats/traits already exists (ignoring name)
+function findDuplicateCard(userId, cardData) {
+    const traits = JSON.stringify((cardData.traits || []).sort());
+    const duplicate = cardOps.findDuplicate.get(
+        userId,
+        cardData.attack,
+        cardData.health,
+        cardData.manaCost,
+        traits
+    );
+    return duplicate || null;
 }
 
 function getCardsByUser(userId) {
@@ -247,6 +265,7 @@ module.exports = {
     getUserById,
     // Cards
     createCard,
+    findDuplicateCard,
     getCardsByUser,
     getCardById,
     updateCard,

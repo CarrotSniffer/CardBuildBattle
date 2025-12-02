@@ -76,13 +76,28 @@ app.post('/api/cards', auth.authMiddleware, (req, res) => {
             return res.status(400).json({ error: validation.errors.join(', ') });
         }
 
+        // Check for duplicate card (same stats/traits, different name)
+        const sortedTraits = (cardData.traits || []).sort();
+        const duplicate = db.findDuplicateCard(req.user.id, {
+            attack: cardData.attack,
+            health: cardData.health,
+            manaCost: cardData.manaCost,
+            traits: sortedTraits
+        });
+
+        if (duplicate) {
+            return res.status(400).json({
+                error: `A card with these exact stats and traits already exists: "${duplicate.name}"`
+            });
+        }
+
         // Create card
         const card = db.createCard(req.user.id, {
             name: cardData.name,
             attack: cardData.attack,
             health: cardData.health,
             manaCost: cardData.manaCost,
-            traits: cardData.traits || [],
+            traits: sortedTraits,
             pointTotal: validation.pointCost
         });
 
@@ -220,7 +235,7 @@ function validateDeck(cardList, userId) {
         cardCounts[item.cardId] = (cardCounts[item.cardId] || 0) + (item.count || 1);
     });
 
-    // Check total cards
+    // Check total cards (25 custom cards - 7 lands are added automatically at game start)
     if (totalCards !== 25) {
         errors.push(`Deck must have exactly 25 cards (has ${totalCards})`);
     }

@@ -125,9 +125,9 @@ function addCardToDeck(cardId) {
         return;
     }
 
-    // Check deck size
+    // Check deck size (25 custom cards, 7 lands added automatically)
     if (getTotalCardsInDeck() >= 25) {
-        showValidation('Deck is full (25 cards max)');
+        showValidation('Deck is full (25 custom cards max)');
         return;
     }
 
@@ -225,7 +225,7 @@ function updateDeckStats() {
     document.getElementById('deck-unique-count').textContent = unique;
     document.getElementById('deck-avg-mana').textContent = avgMana;
 
-    // Update color based on validity
+    // Update color based on validity (25 custom cards required)
     const countEl = document.getElementById('deck-card-count');
     countEl.style.color = total === 25 ? 'var(--success-color)' : total > 25 ? 'var(--accent-color)' : 'var(--text-primary)';
 }
