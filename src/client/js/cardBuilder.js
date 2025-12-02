@@ -5,6 +5,9 @@
 // Point system data (loaded from server)
 let pointSystem = null;
 
+// Available sprites (loaded from server)
+let availableSprites = [];
+
 // Current card state
 let currentCard = {
     id: null,
@@ -12,7 +15,8 @@ let currentCard = {
     attack: 1,
     health: 1,
     manaCost: 2,
-    traits: []
+    traits: [],
+    spriteId: null
 };
 
 // User's cards
@@ -32,11 +36,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load user's cards
     await loadMyCards();
 
+    // Load available sprites
+    await loadSprites();
+
     // Setup event listeners
     setupEventListeners();
 
     // Initial render
     updatePointsDisplay();
+    updateSpriteDisplay();
 });
 
 async function loadPointSystem() {
@@ -60,22 +68,185 @@ async function loadMyCards() {
     }
 }
 
+async function loadSprites() {
+    try {
+        const traitsParam = currentCard.traits.length > 0 ? currentCard.traits.join(',') : '';
+        const response = await fetch(`/api/sprites?traits=${traitsParam}`);
+        const data = await response.json();
+        availableSprites = data.sprites || [];
+        renderSpriteGrid();
+    } catch (error) {
+        console.error('Failed to load sprites:', error);
+    }
+}
+
+function renderSpriteGrid() {
+    const container = document.getElementById('sprite-grid');
+    container.innerHTML = '';
+
+    availableSprites.forEach(sprite => {
+        const el = document.createElement('div');
+        el.className = 'sprite-item' + (currentCard.spriteId === sprite.id ? ' selected' : '');
+        el.dataset.spriteId = sprite.id;
+        el.style.background = sprite.gradient;
+        el.innerHTML = `<span class="sprite-icon">${sprite.icon}</span>`;
+        el.title = sprite.name;
+
+        el.addEventListener('click', () => selectSprite(sprite.id));
+        container.appendChild(el);
+    });
+}
+
+function selectSprite(spriteId) {
+    currentCard.spriteId = spriteId;
+    renderSpriteGrid();
+    updateSpriteDisplay();
+}
+
+function updateSpriteDisplay() {
+    const display = document.getElementById('card-sprite-display');
+    if (currentCard.spriteId) {
+        const sprite = availableSprites.find(s => s.id === currentCard.spriteId);
+        if (sprite) {
+            display.style.background = sprite.gradient;
+            display.innerHTML = `<span class="sprite-icon">${sprite.icon}</span>`;
+            return;
+        }
+    }
+    // Default display
+    display.style.background = 'linear-gradient(135deg, #4a4a6a 0%, #2a2a4a 100%)';
+    display.innerHTML = '<span class="sprite-icon">?</span>';
+}
+
+// Trait category definitions
+const TRAIT_CATEGORIES = {
+    // Positive trait categories
+    offense: {
+        name: 'Offense',
+        icon: '⚔️',
+        positive: true,
+        traits: ['charge', 'piercing', 'deathtouch', 'frenzy', 'warcry', 'overpower']
+    },
+    defense: {
+        name: 'Defense',
+        icon: '🛡️',
+        positive: true,
+        traits: ['taunt', 'armor', 'divine_shield', 'guardian', 'thorns', 'retaliate']
+    },
+    speed: {
+        name: 'Speed & Evasion',
+        icon: '💨',
+        positive: true,
+        traits: ['swift', 'ranged', 'stealth', 'elusive']
+    },
+    sustain: {
+        name: 'Sustain',
+        icon: '💚',
+        positive: true,
+        traits: ['lifesteal', 'regenerate', 'vampiric', 'undying']
+    },
+    utility: {
+        name: 'Utility',
+        icon: '✨',
+        positive: true,
+        traits: ['inspire', 'rally', 'leech']
+    },
+    // Negative trait categories
+    fragility: {
+        name: 'Fragility',
+        icon: '💔',
+        positive: false,
+        traits: ['frail', 'fragile', 'exposed', 'brittle']
+    },
+    restrictions: {
+        name: 'Restrictions',
+        icon: '🚫',
+        positive: false,
+        traits: ['slow', 'pacifist', 'cowardly', 'cursed']
+    },
+    drawbacks: {
+        name: 'Drawbacks',
+        icon: '⚠️',
+        positive: false,
+        traits: ['costly', 'exhausting', 'draining', 'clumsy', 'reckless']
+    },
+    doom: {
+        name: 'Doom',
+        icon: '💀',
+        positive: false,
+        traits: ['soulbound', 'volatile', 'doomed', 'vengeful', 'disloyal']
+    }
+};
+
 function renderTraits() {
-    // Positive traits
-    const positiveContainer = document.getElementById('positive-traits');
-    positiveContainer.innerHTML = '';
+    const container = document.getElementById('traits-container');
+    container.innerHTML = '';
 
-    Object.values(pointSystem.positiveTraits).forEach(trait => {
-        positiveContainer.appendChild(createTraitElement(trait, true));
+    // Combine all traits
+    const allPositive = Object.values(pointSystem.positiveTraits);
+    const allNegative = Object.values(pointSystem.negativeTraits);
+
+    // Render positive categories first
+    const positiveCategories = Object.entries(TRAIT_CATEGORIES).filter(([_, cat]) => cat.positive);
+    const negativeCategories = Object.entries(TRAIT_CATEGORIES).filter(([_, cat]) => !cat.positive);
+
+    // Add positive section header
+    const positiveHeader = document.createElement('div');
+    positiveHeader.className = 'traits-section-header positive';
+    positiveHeader.innerHTML = '<h3>Positive Traits <span class="cost-hint">(Cost Points)</span></h3>';
+    container.appendChild(positiveHeader);
+
+    positiveCategories.forEach(([categoryId, category]) => {
+        const traitsInCategory = allPositive
+            .filter(t => category.traits.includes(t.id))
+            .sort((a, b) => b.cost - a.cost); // Sort by cost descending (highest first)
+
+        if (traitsInCategory.length > 0) {
+            container.appendChild(createCategoryElement(category, traitsInCategory, true));
+        }
     });
 
-    // Negative traits
-    const negativeContainer = document.getElementById('negative-traits');
-    negativeContainer.innerHTML = '';
+    // Add negative section header
+    const negativeHeader = document.createElement('div');
+    negativeHeader.className = 'traits-section-header negative';
+    negativeHeader.innerHTML = '<h3>Negative Traits <span class="cost-hint">(Give Points)</span></h3>';
+    container.appendChild(negativeHeader);
 
-    Object.values(pointSystem.negativeTraits).forEach(trait => {
-        negativeContainer.appendChild(createTraitElement(trait, false));
+    negativeCategories.forEach(([categoryId, category]) => {
+        const traitsInCategory = allNegative
+            .filter(t => category.traits.includes(t.id))
+            .sort((a, b) => a.cost - b.cost); // Sort by cost ascending (most negative first, gives most points)
+
+        if (traitsInCategory.length > 0) {
+            container.appendChild(createCategoryElement(category, traitsInCategory, false));
+        }
     });
+}
+
+function createCategoryElement(category, traits, isPositive) {
+    const section = document.createElement('div');
+    section.className = `trait-category ${isPositive ? 'positive' : 'negative'}`;
+
+    const header = document.createElement('div');
+    header.className = 'trait-category-header';
+    header.innerHTML = `<span class="category-icon">${category.icon}</span> ${category.name}`;
+
+    const list = document.createElement('div');
+    list.className = 'traits-list';
+
+    traits.forEach(trait => {
+        list.appendChild(createTraitElement(trait, isPositive));
+    });
+
+    section.appendChild(header);
+    section.appendChild(list);
+
+    // Make collapsible
+    header.addEventListener('click', () => {
+        section.classList.toggle('collapsed');
+    });
+
+    return section;
 }
 
 function createTraitElement(trait, isPositive) {
@@ -166,6 +337,13 @@ function addTrait(traitId) {
         return;
     }
 
+    // Check max traits limit (3 maximum)
+    const maxTraits = pointSystem?.maxTraits || 3;
+    if (currentCard.traits.length >= maxTraits) {
+        showError(`Maximum ${maxTraits} traits per card`);
+        return;
+    }
+
     // Check for conflicting traits
     if (traitId === 'swift' && currentCard.traits.includes('slow')) {
         showError('Cannot have both Swift and Slow');
@@ -179,19 +357,30 @@ function addTrait(traitId) {
     currentCard.traits.push(traitId);
     renderActiveTraits();
     updatePointsDisplay();
+    // Reload sprites when traits change (more sprites become available)
+    loadSprites();
 }
 
 function removeTrait(traitId) {
     currentCard.traits = currentCard.traits.filter(t => t !== traitId);
     renderActiveTraits();
     updatePointsDisplay();
+    // Reload sprites when traits change (some sprites may no longer be available)
+    // Also clear sprite selection if current sprite is no longer valid
+    loadSprites().then(() => {
+        if (currentCard.spriteId && !availableSprites.find(s => s.id === currentCard.spriteId)) {
+            currentCard.spriteId = null;
+            updateSpriteDisplay();
+        }
+    });
 }
 
 function renderActiveTraits() {
     const container = document.getElementById('active-traits');
+    const maxTraits = pointSystem?.maxTraits || 3;
 
     if (currentCard.traits.length === 0) {
-        container.innerHTML = '<span class="empty-traits-hint">Drag traits here</span>';
+        container.innerHTML = `<span class="empty-traits-hint">Drag traits here (max ${maxTraits})</span>`;
         return;
     }
 
@@ -272,7 +461,8 @@ function resetCard() {
         attack: 1,
         health: 1,
         manaCost: 2,
-        traits: []
+        traits: [],
+        spriteId: null
     };
 
     // Reset UI
@@ -291,6 +481,8 @@ function resetCard() {
 
     renderActiveTraits();
     updatePointsDisplay();
+    updateSpriteDisplay();
+    loadSprites();
     hideError();
 
     // Deselect cards
@@ -323,7 +515,8 @@ async function saveCard() {
             attack: currentCard.attack,
             health: currentCard.health,
             manaCost: currentCard.manaCost,
-            traits: currentCard.traits
+            traits: currentCard.traits,
+            spriteId: currentCard.spriteId
         };
 
         if (currentCard.id) {
@@ -389,7 +582,8 @@ function editCard(card) {
         attack: card.attack,
         health: card.health,
         manaCost: card.manaCost,
-        traits: [...card.traits]
+        traits: [...card.traits],
+        spriteId: card.spriteId || null
     };
 
     // Update UI
@@ -408,6 +602,9 @@ function editCard(card) {
     updateManaDisplay();
     renderActiveTraits();
     updatePointsDisplay();
+    loadSprites().then(() => {
+        updateSpriteDisplay();
+    });
 
     // Highlight selected card
     document.querySelectorAll('.card-mini.selected').forEach(el => {

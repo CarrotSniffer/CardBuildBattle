@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Bot - Test Player</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a2e;
+            color: #0f0;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            color: #0ff;
+            border-bottom: 1px solid #0ff;
+            padding-bottom: 10px;
+        }
+        #console {
+            background: #0d0d1a;
+            border: 1px solid #333;
+            padding: 15px;
+            height: 500px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .info { color: #0ff; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .warn { color: #ff0; }
+        .instructions {
+            background: #16213e;
+            border: 1px solid #0ff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #0ff;
+        }
+        .instructions ol {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Game Bot - Automated Test Player</h1>
+
+    <div class="instructions">
+        <h3>How to use:</h3>
+        <ol>
+            <li>Open the main game in another browser tab: <a href="/" style="color: #0ff;">Main Game</a></li>
+            <li>The bot will automatically register, create cards, and build a deck</li>
+            <li>Create a lobby in the main game OR let the bot create one</li>
+            <li>Join the bot's lobby from the main game (or bot will join yours)</li>
+            <li>Start the game and watch the bot play!</li>
+        </ol>
+    </div>
+
+    <div id="console"></div>
+
+    <script>
+        // Override console.log to display in the page
+        const consoleDiv = document.getElementById('console');
+        const originalLog = console.log;
+        const originalError = console.error;
+
+        function addToConsole(message, type = 'info') {
+            const line = document.createElement('div');
+            line.className = type;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        console.log = function(...args) {
+            const message = args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ');
+            let type = 'info';
+            if (message.includes('Error') || message.includes('error')) type = 'error';
+            else if (message.includes('Created') || message.includes('success') || message.includes('Authenticated')) type = 'success';
+            else if (message.includes('Waiting') || message.includes('warn')) type = 'warn';
+            addToConsole(message, type);
+            originalLog.apply(console, args);
+        };
+
+        console.error = function(...args) {
+            const message = args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ');
+            addToConsole(message, 'error');
+            originalError.apply(console, args);
+        };
+
+        addToConsole('Bot console ready. Loading bot script...', 'info');
+    </script>
+    <script src="js/bot.js"></script>
+</body>
+</html>

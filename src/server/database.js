@@ -35,10 +35,18 @@ db.exec(`
         mana_cost INTEGER NOT NULL,
         traits TEXT NOT NULL,
         point_total INTEGER NOT NULL,
+        sprite_id TEXT DEFAULT NULL,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
 `);
+
+// Add sprite_id column if it doesn't exist (for existing databases)
+try {
+    db.exec(`ALTER TABLE cards ADD COLUMN sprite_id TEXT DEFAULT NULL`);
+} catch (e) {
+    // Column already exists, ignore
+}
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS decks (
@@ -75,8 +83,8 @@ const userOps = {
 // Card operations
 const cardOps = {
     create: db.prepare(`
-        INSERT INTO cards (id, user_id, name, attack, health, mana_cost, traits, point_total)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO cards (id, user_id, name, attack, health, mana_cost, traits, point_total, sprite_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `),
 
     findByUser: db.prepare(`
@@ -94,7 +102,7 @@ const cardOps = {
 
     update: db.prepare(`
         UPDATE cards
-        SET name = ?, attack = ?, health = ?, mana_cost = ?, traits = ?, point_total = ?
+        SET name = ?, attack = ?, health = ?, mana_cost = ?, traits = ?, point_total = ?, sprite_id = ?
         WHERE id = ? AND user_id = ?
     `),
 
@@ -162,9 +170,10 @@ function createCard(userId, cardData) {
         cardData.health,
         cardData.manaCost,
         traits,
-        cardData.pointTotal
+        cardData.pointTotal,
+        cardData.spriteId || null
     );
-    return { id, ...cardData, traits: cardData.traits || [] };
+    return { id, ...cardData, traits: cardData.traits || [], spriteId: cardData.spriteId || null };
 }
 
 // Check if a card with same stats/traits already exists (ignoring name)
@@ -186,7 +195,8 @@ function getCardsByUser(userId) {
         ...card,
         manaCost: card.mana_cost,
         pointTotal: card.point_total,
-        traits: JSON.parse(card.traits)
+        traits: JSON.parse(card.traits),
+        spriteId: card.sprite_id
     }));
 }
 
@@ -197,7 +207,8 @@ function getCardById(id) {
         ...card,
         manaCost: card.mana_cost,
         pointTotal: card.point_total,
-        traits: JSON.parse(card.traits)
+        traits: JSON.parse(card.traits),
+        spriteId: card.sprite_id
     };
 }
 
@@ -210,6 +221,7 @@ function updateCard(id, userId, cardData) {
         cardData.manaCost,
         traits,
         cardData.pointTotal,
+        cardData.spriteId || null,
         id,
         userId
     );
