@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Builder - Strategic Card Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/builder.css">
+</head>
+<body>
+    <div class="builder-container">
+        <!-- Navigation -->
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="/">Play</a>
+                <a href="/card-builder.html" class="active">Card Builder</a>
+                <a href="/deck-builder.html">Deck Builder</a>
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button class="btn-logout" onclick="Auth.logout()">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Main Builder Area -->
+        <div class="builder-main">
+            <!-- Traits Panel (Left) -->
+            <div class="panel traits-panel">
+                <div class="panel-header">
+                    <h2>Traits</h2>
+                </div>
+                <div class="panel-content">
+                    <div class="traits-section">
+                        <h3>Positive Traits (Cost Points)</h3>
+                        <div id="positive-traits" class="traits-list"></div>
+                    </div>
+                    <div class="traits-section">
+                        <h3>Negative Traits (Give Points)</h3>
+                        <div id="negative-traits" class="traits-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Preview Panel (Center) -->
+            <div class="panel card-preview-panel">
+                <div class="panel-header">
+                    <h2>Card Editor</h2>
+                    <button class="btn btn-secondary" onclick="resetCard()">Reset</button>
+                </div>
+
+                <!-- Points Display -->
+                <div class="points-display">
+                    <div class="points-label">Points Remaining</div>
+                    <div id="points-value" class="points-value">10</div>
+                </div>
+
+                <!-- Card Preview -->
+                <div class="card-preview-large" style="position: relative;">
+                    <div id="card-mana-display" class="card-cost">2</div>
+                    <input type="text" id="card-name" class="card-name-input"
+                           placeholder="Card Name" maxlength="20">
+
+                    <!-- Active Traits -->
+                    <div id="active-traits" class="active-traits">
+                        <span class="empty-traits-hint">Drag traits here</span>
+                    </div>
+
+                    <div class="card-stats-row">
+                        <span class="card-stat attack">&#9876; <span id="attack-display">1</span></span>
+                        <span class="card-stat health">&#9829; <span id="health-display">1</span></span>
+                    </div>
+                </div>
+
+                <!-- Stat Sliders -->
+                <div class="stat-controls">
+                    <div class="stat-control">
+                        <span class="stat-label">Attack</span>
+                        <input type="range" id="attack-slider" min="0" max="15" value="1">
+                        <span id="attack-value" class="stat-value">1</span>
+                    </div>
+                    <div class="stat-control">
+                        <span class="stat-label">Health</span>
+                        <input type="range" id="health-slider" min="1" max="20" value="1">
+                        <span id="health-value" class="stat-value">1</span>
+                    </div>
+                    <div class="stat-control">
+                        <span class="stat-label">Mana Cost</span>
+                        <input type="range" id="mana-slider" min="0" max="12" value="2">
+                        <span id="mana-value" class="stat-value">2</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="card-actions">
+                    <button id="save-card-btn" class="btn btn-primary" onclick="saveCard()">Save Card</button>
+                    <button id="delete-card-btn" class="btn btn-secondary" onclick="deleteCard()" style="display: none;">Delete</button>
+                </div>
+
+                <div id="card-error" class="error-message hidden"></div>
+            </div>
+
+            <!-- My Cards Panel (Right) -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>My Cards</h2>
+                    <span id="card-count">0 cards</span>
+                </div>
+                <div class="panel-content">
+                    <div id="my-cards" class="cards-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/cardBuilder.js"></script>
+</body>
+</html>

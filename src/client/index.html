@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Card Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/builder.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Main Menu Screen -->
+        <div id="menu-screen" class="screen active">
+            <!-- Navigation -->
+            <nav class="nav-bar" style="position: absolute; top: 1rem; left: 1rem; right: 1rem;">
+                <div class="nav-links">
+                    <a href="/" class="active">Play</a>
+                    <a href="/card-builder.html">Card Builder</a>
+                    <a href="/deck-builder.html">Deck Builder</a>
+                </div>
+                <div class="user-info">
+                    <span id="username-display"></span>
+                    <button class="btn-logout" onclick="Auth.logout()">Logout</button>
+                </div>
+            </nav>
+
+            <h1>Strategic Card Game</h1>
+            <p class="subtitle">A game of pure strategy - no luck involved</p>
+
+            <!-- Deck Selection -->
+            <div id="deck-selection" style="margin-bottom: 1rem;">
+                <label style="color: var(--text-secondary);">Select Deck:</label>
+                <select id="deck-select" class="deck-selector">
+                    <option value="">-- Select a deck --</option>
+                </select>
+            </div>
+
+            <div class="menu-buttons">
+                <button id="find-game-btn" class="btn btn-primary" disabled>Find Match</button>
+                <button id="how-to-play-btn" class="btn btn-secondary">How to Play</button>
+            </div>
+            <div id="searching-status" class="hidden">
+                <div class="spinner"></div>
+                <p>Searching for opponent...</p>
+                <button id="cancel-search-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+            <p id="no-deck-warning" style="color: var(--warning-color); margin-top: 1rem;">
+                You need to <a href="/card-builder.html" style="color: var(--primary-color);">create cards</a> and
+                <a href="/deck-builder.html" style="color: var(--primary-color);">build a deck</a> to play!
+            </p>
+        </div>
+
+        <!-- How to Play Screen -->
+        <div id="rules-screen" class="screen">
+            <h2>How to Play</h2>
+            <div class="rules-content">
+                <h3>Objective</h3>
+                <p>Reduce your opponent's health to 0 using strategic card play.</p>
+
+                <h3>Game Flow</h3>
+                <ul>
+                    <li>Each player starts with 30 health and 4 cards</li>
+                    <li>Player 2 draws an extra card to compensate for going second</li>
+                    <li>Each turn you gain 1 max mana (up to 10) and draw 1 card</li>
+                    <li>Play cards by spending mana, then attack with your units</li>
+                </ul>
+
+                <h3>Card Types</h3>
+                <ul>
+                    <li><strong>Units:</strong> Creatures that can attack and defend</li>
+                    <li><strong>Spells:</strong> One-time effects</li>
+                    <li><strong>Structures:</strong> Persistent effects on the field</li>
+                </ul>
+
+                <h3>Unit Abilities</h3>
+                <ul>
+                    <li><strong>Swift:</strong> Can attack immediately when played</li>
+                    <li><strong>Taunt:</strong> Enemies must attack this unit first</li>
+                    <li><strong>Ranged:</strong> Attacks without receiving counter-damage</li>
+                    <li><strong>Armor:</strong> Takes 1 less damage from all sources</li>
+                    <li><strong>Charge:</strong> Deals double damage when attacking</li>
+                </ul>
+
+                <h3>No Luck Elements</h3>
+                <p>All game mechanics are deterministic. The only hidden information is your opponent's hand. Deck order is determined by a fixed seed at game start.</p>
+            </div>
+            <button id="back-to-menu-btn" class="btn btn-primary">Back to Menu</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <!-- Opponent Area -->
+            <div id="opponent-area" class="player-area opponent">
+                <div class="player-info">
+                    <div class="health-display">
+                        <span class="health-icon">♥</span>
+                        <span id="opponent-health">30</span>
+                    </div>
+                    <div class="mana-display">
+                        <span class="mana-icon">◆</span>
+                        <span id="opponent-mana">1/1</span>
+                    </div>
+                    <div class="deck-count">
+                        <span class="deck-icon">📚</span>
+                        <span id="opponent-deck">20</span>
+                    </div>
+                    <div class="hand-count">
+                        <span class="hand-icon">🃏</span>
+                        <span id="opponent-hand-count">4</span>
+                    </div>
+                </div>
+                <div id="opponent-structures" class="structures-row"></div>
+                <div id="opponent-field" class="field-row"></div>
+            </div>
+
+            <!-- Center Area -->
+            <div id="center-area">
+                <div id="turn-indicator">
+                    <span id="turn-text">Your Turn</span>
+                    <span id="turn-number">Turn 1</span>
+                </div>
+                <button id="end-turn-btn" class="btn btn-action">End Turn</button>
+            </div>
+
+            <!-- Player Area -->
+            <div id="player-area" class="player-area player">
+                <div id="player-field" class="field-row"></div>
+                <div id="player-structures" class="structures-row"></div>
+                <div class="player-info">
+                    <div class="health-display">
+                        <span class="health-icon">♥</span>
+                        <span id="player-health">30</span>
+                    </div>
+                    <div class="mana-display">
+                        <span class="mana-icon">◆</span>
+                        <span id="player-mana">1/1</span>
+                    </div>
+                    <div class="deck-count">
+                        <span class="deck-icon">📚</span>
+                        <span id="player-deck">20</span>
+                    </div>
+                </div>
+                <div id="player-hand" class="hand-row"></div>
+            </div>
+
+            <!-- Game Messages -->
+            <div id="game-messages"></div>
+
+            <!-- Target Selection Overlay -->
+            <div id="target-overlay" class="hidden">
+                <div class="overlay-content">
+                    <p id="target-prompt">Select a target</p>
+                    <button id="cancel-target-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameover-screen" class="screen">
+            <h2 id="gameover-title">Game Over</h2>
+            <p id="gameover-message"></p>
+            <button id="play-again-btn" class="btn btn-primary">Play Again</button>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/client.js"></script>
+</body>
+</html>

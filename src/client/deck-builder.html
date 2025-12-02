@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deck Builder - Strategic Card Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/builder.css">
+</head>
+<body>
+    <div class="builder-container">
+        <!-- Navigation -->
+        <nav class="nav-bar">
+            <div class="nav-links">
+                <a href="/">Play</a>
+                <a href="/card-builder.html">Card Builder</a>
+                <a href="/deck-builder.html" class="active">Deck Builder</a>
+            </div>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button class="btn-logout" onclick="Auth.logout()">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Main Builder Area -->
+        <div class="deck-builder-main">
+            <!-- Card Collection (Left) -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>My Cards</h2>
+                    <span id="collection-count">0 cards</span>
+                </div>
+                <div class="panel-content">
+                    <div id="card-collection" class="cards-grid"></div>
+                </div>
+            </div>
+
+            <!-- Deck Panel (Right) -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Current Deck</h2>
+                    <button class="btn btn-secondary" onclick="newDeck()">New Deck</button>
+                </div>
+
+                <!-- Deck Name -->
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <input type="text" id="deck-name" class="card-name-input"
+                           placeholder="Deck Name" maxlength="30"
+                           style="text-align: left; border: 2px solid var(--card-border); border-radius: 6px; padding: 0.5rem;">
+                </div>
+
+                <!-- Deck Stats -->
+                <div class="deck-stats">
+                    <div class="deck-stat">
+                        <div id="deck-card-count" class="deck-stat-value">0</div>
+                        <div class="deck-stat-label">/ 25 Cards</div>
+                    </div>
+                    <div class="deck-stat">
+                        <div id="deck-unique-count" class="deck-stat-value">0</div>
+                        <div class="deck-stat-label">Unique</div>
+                    </div>
+                    <div class="deck-stat">
+                        <div id="deck-avg-mana" class="deck-stat-value">0</div>
+                        <div class="deck-stat-label">Avg Mana</div>
+                    </div>
+                </div>
+
+                <!-- Deck Validation -->
+                <div id="deck-validation" class="error-message hidden"></div>
+
+                <!-- Deck Cards List -->
+                <div class="panel-content">
+                    <div id="deck-cards" class="deck-list"></div>
+                </div>
+
+                <!-- Deck Actions -->
+                <div class="card-actions">
+                    <button id="save-deck-btn" class="btn btn-primary" onclick="saveDeck()">Save Deck</button>
+                    <button id="delete-deck-btn" class="btn btn-secondary" onclick="deleteDeck()" style="display: none;">Delete</button>
+                </div>
+
+                <!-- Saved Decks -->
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--card-border);">
+                    <h3 style="margin-bottom: 0.5rem;">Saved Decks</h3>
+                    <div id="saved-decks" class="deck-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/deckBuilder.js"></script>
+</body>
+</html>
