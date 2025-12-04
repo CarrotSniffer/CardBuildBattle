@@ -1,5 +1,6 @@
 /**
  * Deck Builder Module
+ * Single responsive layout
  */
 
 // User's cards
@@ -21,7 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!Auth.requireAuth()) return;
 
     // Display username
-    document.getElementById('username-display').textContent = Auth.user.username;
+    const usernameDisplay = document.getElementById('username-display');
+    if (usernameDisplay) usernameDisplay.textContent = Auth.user.username;
 
     // Load data
     await Promise.all([
@@ -56,14 +58,21 @@ async function loadMyDecks() {
 }
 
 function setupEventListeners() {
-    document.getElementById('deck-name').addEventListener('input', (e) => {
-        currentDeck.name = e.target.value;
-    });
+    const deckNameInput = document.getElementById('deck-name');
+    if (deckNameInput) {
+        deckNameInput.addEventListener('input', (e) => {
+            currentDeck.name = e.target.value;
+        });
+    }
 }
 
 function renderCardCollection() {
     const container = document.getElementById('card-collection');
-    document.getElementById('collection-count').textContent = `${myCards.length} cards`;
+    const countEl = document.getElementById('collection-count');
+
+    if (countEl) countEl.textContent = `${myCards.length} cards`;
+
+    if (!container) return;
 
     if (myCards.length === 0) {
         container.innerHTML = `
@@ -102,7 +111,9 @@ function renderCardCollection() {
             ${inDeck > 0 ? `<div style="text-align: center; font-size: 0.7rem; color: var(--success-color);">x${inDeck} in deck</div>` : ''}
         `;
 
-        el.addEventListener('click', () => addCardToDeck(card.id));
+        el.addEventListener('click', () => {
+            addCardToDeck(card.id);
+        });
         container.appendChild(el);
     });
 }
@@ -161,6 +172,7 @@ function removeCardFromDeck(cardId) {
 
 function renderDeckCards() {
     const container = document.getElementById('deck-cards');
+    if (!container) return;
 
     if (currentDeck.cardList.length === 0) {
         container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 1rem;">Click cards to add them</p>';
@@ -221,13 +233,17 @@ function updateDeckStats() {
     });
     const avgMana = total > 0 ? (totalMana / total).toFixed(1) : '0';
 
-    document.getElementById('deck-card-count').textContent = total;
-    document.getElementById('deck-unique-count').textContent = unique;
-    document.getElementById('deck-avg-mana').textContent = avgMana;
-
-    // Update color based on validity (25 custom cards required)
+    // Update stats
     const countEl = document.getElementById('deck-card-count');
-    countEl.style.color = total === 25 ? 'var(--success-color)' : total > 25 ? 'var(--accent-color)' : 'var(--text-primary)';
+    const uniqueEl = document.getElementById('deck-unique-count');
+    const avgEl = document.getElementById('deck-avg-mana');
+
+    if (countEl) {
+        countEl.textContent = total;
+        countEl.style.color = total === 25 ? 'var(--success-color)' : total > 25 ? 'var(--accent-color)' : 'var(--text-primary)';
+    }
+    if (uniqueEl) uniqueEl.textContent = unique;
+    if (avgEl) avgEl.textContent = avgMana;
 }
 
 function validateDeck() {
@@ -263,9 +279,14 @@ function newDeck() {
         cardList: []
     };
 
-    document.getElementById('deck-name').value = '';
-    document.getElementById('delete-deck-btn').style.display = 'none';
-    document.getElementById('save-deck-btn').textContent = 'Save Deck';
+    // Reset UI
+    const deckNameInput = document.getElementById('deck-name');
+    const deleteBtn = document.getElementById('delete-deck-btn');
+    const saveBtn = document.getElementById('save-deck-btn');
+
+    if (deckNameInput) deckNameInput.value = '';
+    if (deleteBtn) deleteBtn.style.display = 'none';
+    if (saveBtn) saveBtn.textContent = 'Save Deck';
 
     renderDeckCards();
     renderCardCollection();
@@ -273,7 +294,7 @@ function newDeck() {
     hideValidation();
 
     // Deselect in saved decks
-    document.querySelectorAll('#saved-decks .deck-card-item.selected').forEach(el => {
+    document.querySelectorAll('.deck-card-item.selected').forEach(el => {
         el.classList.remove('selected');
     });
 }
@@ -354,9 +375,14 @@ function loadDeck(deck) {
         cardList: [...deck.cardList]
     };
 
-    document.getElementById('deck-name').value = deck.name;
-    document.getElementById('delete-deck-btn').style.display = 'block';
-    document.getElementById('save-deck-btn').textContent = 'Update Deck';
+    // Update UI
+    const deckNameInput = document.getElementById('deck-name');
+    const deleteBtn = document.getElementById('delete-deck-btn');
+    const saveBtn = document.getElementById('save-deck-btn');
+
+    if (deckNameInput) deckNameInput.value = deck.name;
+    if (deleteBtn) deleteBtn.style.display = 'block';
+    if (saveBtn) saveBtn.textContent = 'Update Deck';
 
     renderDeckCards();
     renderCardCollection();
@@ -364,13 +390,14 @@ function loadDeck(deck) {
     hideValidation();
 
     // Highlight in saved decks
-    document.querySelectorAll('#saved-decks .deck-card-item').forEach(el => {
+    document.querySelectorAll('.deck-card-item').forEach(el => {
         el.classList.toggle('selected', el.dataset.deckId === deck.id);
     });
 }
 
 function renderSavedDecks() {
     const container = document.getElementById('saved-decks');
+    if (!container) return;
 
     if (myDecks.length === 0) {
         container.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.85rem;">No saved decks</p>';
@@ -401,10 +428,15 @@ function renderSavedDecks() {
 
 function showValidation(message) {
     const el = document.getElementById('deck-validation');
-    el.textContent = message;
-    el.classList.remove('hidden');
+    if (el) {
+        el.textContent = message;
+        el.classList.remove('hidden');
+    }
 }
 
 function hideValidation() {
-    document.getElementById('deck-validation').classList.add('hidden');
+    const el = document.getElementById('deck-validation');
+    if (el) {
+        el.classList.add('hidden');
+    }
 }

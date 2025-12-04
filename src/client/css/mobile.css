@@ -1,0 +1,1203 @@
+/* ===================== */
+/* RESPONSIVE STYLES */
+/* Single responsive layout for all devices */
+/* ===================== */
+
+/* ===================== */
+/* BASE RESPONSIVE FIXES */
+/* ===================== */
+
+/* Allow scrolling on all devices */
+html {
+    overflow-x: hidden;
+}
+
+body {
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* ===================== */
+/* LARGE TABLETS (max-width: 1024px) */
+/* ===================== */
+
+@media (max-width: 1024px) {
+    /* Hide event log on smaller screens */
+    .event-log-panel {
+        display: none;
+    }
+
+    /* Adjust game layout */
+    #game-screen {
+        padding: 0.5rem;
+    }
+
+    /* Slightly smaller cards */
+    .card {
+        width: 90px;
+        height: 125px;
+    }
+
+    .field-unit {
+        width: 80px;
+        height: 100px;
+    }
+}
+
+/* ===================== */
+/* TABLETS (max-width: 768px) */
+/* ===================== */
+
+@media (max-width: 768px) {
+    /* Base adjustments */
+    html, body {
+        font-size: 14px;
+    }
+
+    /* =============== */
+    /* NAVIGATION */
+    /* =============== */
+    .nav-bar {
+        position: relative;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .nav-links {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.25rem;
+    }
+
+    .nav-links a {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .user-info span {
+        display: none; /* Hide username on mobile to save space */
+    }
+
+    .btn-logout {
+        min-height: 36px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    /* =============== */
+    /* AUTH / LOGIN PAGE */
+    /* =============== */
+    .auth-container {
+        width: 95%;
+        max-width: 400px;
+        padding: 1.5rem;
+        margin: 1rem auto;
+    }
+
+    .auth-container h1 {
+        font-size: 1.75rem;
+    }
+
+    .auth-container .subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-tabs {
+        gap: 0.5rem;
+    }
+
+    .tab-btn {
+        padding: 0.75rem;
+        font-size: 1rem;
+        min-height: 48px;
+    }
+
+    .form-group input {
+        font-size: 16px; /* Prevents iOS zoom */
+        padding: 0.875rem 1rem;
+        min-height: 48px;
+    }
+
+    .auth-form .btn {
+        min-height: 48px;
+        font-size: 1rem;
+    }
+
+    /* =============== */
+    /* MENU SCREEN */
+    /* =============== */
+    #menu-screen {
+        padding: 0.5rem;
+        gap: 0.75rem;
+    }
+
+    #menu-screen h1 {
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+    }
+
+    #menu-screen .subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Deck selection */
+    .deck-selection-box {
+        width: 100%;
+        max-width: none;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+
+    .deck-selector {
+        width: 100%;
+        font-size: 16px; /* Prevents iOS zoom */
+        padding: 0.875rem;
+        min-height: 48px;
+    }
+
+    /* Lobby actions */
+    .lobby-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.75rem;
+    }
+
+    .lobby-actions .btn {
+        width: 100%;
+        min-height: 48px;
+        padding: 0.875rem;
+    }
+
+    /* Lobby browser */
+    .lobby-browser {
+        width: 100%;
+        max-width: none;
+        padding: 1rem;
+    }
+
+    .lobby-item {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .lobby-item .join-btn {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    /* =============== */
+    /* LOBBY SCREEN */
+    /* =============== */
+    #lobby-screen {
+        padding: 1rem;
+    }
+
+    #lobby-screen h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .lobby-details {
+        width: 100%;
+        max-width: none;
+        padding: 1.25rem;
+    }
+
+    .lobby-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .lobby-buttons .btn {
+        width: 100%;
+        min-height: 48px;
+    }
+
+    /* =============== */
+    /* RULES SCREEN */
+    /* =============== */
+    #rules-screen {
+        padding: 0.75rem;
+        padding-top: 0;
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #rules-screen h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Back button at top for easy access */
+    #rules-screen .btn {
+        order: -1;
+        margin-bottom: 0.5rem;
+        margin-top: 0;
+        min-height: 44px;
+        width: 100%;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #357abd 100%);
+    }
+
+    .rules-content {
+        max-width: 100%;
+        padding: 0;
+        max-height: none;
+        overflow-y: visible;
+        margin-bottom: 1rem;
+    }
+
+    .rules-content h3 {
+        font-size: 1.1rem;
+        margin-top: 1rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .rules-content h4 {
+        font-size: 0.95rem;
+        margin-top: 0.75rem;
+    }
+
+    .rules-content p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .rules-content ul {
+        margin-left: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .rules-content li {
+        font-size: 0.85rem;
+        margin: 0.3rem 0;
+        line-height: 1.4;
+    }
+
+    .rules-content li strong {
+        color: var(--primary-color);
+    }
+
+    /* =============== */
+    /* GAME SCREEN */
+    /* =============== */
+    #game-screen {
+        padding: 0;
+        height: 100vh;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    /* Player bars */
+    .player-bar {
+        padding: 0.4rem 0.75rem;
+        gap: 0.75rem;
+    }
+
+    .player-portrait {
+        width: 50px;
+        height: 50px;
+    }
+
+    .portrait-health {
+        font-size: 1.2rem;
+    }
+
+    .portrait-name {
+        font-size: 0.5rem;
+    }
+
+    .player-stats {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .stat {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .stat-icon {
+        font-size: 1rem;
+    }
+
+    /* Battlefield zones */
+    .battlefield-zone {
+        min-height: 80px;
+        padding: 0.4rem;
+    }
+
+    .units-container {
+        gap: 0.4rem;
+    }
+
+    /* Cards on field */
+    .field-unit {
+        width: 55px;
+        height: 72px;
+    }
+
+    .field-unit .card-cost {
+        width: 18px;
+        height: 18px;
+        font-size: 0.6rem;
+    }
+
+    .field-unit .card-name {
+        font-size: 0.45rem;
+    }
+
+    .field-unit .card-attack,
+    .field-unit .card-health {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.25rem;
+    }
+
+    .field-unit .abilities {
+        display: none;
+    }
+
+    /* Lands zone */
+    .lands-zone {
+        min-height: 40px;
+        padding: 0.25rem 0.5rem;
+        gap: 0.75rem;
+    }
+
+    .land-card {
+        width: 32px;
+        height: 32px;
+        font-size: 0.6rem;
+    }
+
+    .land-icon {
+        font-size: 0.9rem;
+    }
+
+    .land-health {
+        font-size: 0.55rem;
+    }
+
+    .btn-land-small {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.7rem;
+        min-height: 32px;
+    }
+
+    /* Center divider */
+    .game-center-divider {
+        padding: 0.4rem 0.75rem;
+        gap: 1rem;
+    }
+
+    .turn-badge {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .turn-number {
+        font-size: 0.7rem;
+    }
+
+    .btn-end-turn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        min-width: 100px;
+    }
+
+    /* Hand zone */
+    .hand-zone {
+        padding: 0.4rem 0.5rem;
+        min-height: 100px;
+    }
+
+    .hand-container {
+        gap: 0.35rem;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.25rem;
+        justify-content: flex-start;
+    }
+
+    /* Cards in hand */
+    .hand-container .card {
+        width: 60px;
+        height: 82px;
+        flex-shrink: 0;
+        padding: 0.2rem;
+    }
+
+    .hand-container .card-cost {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+        top: -6px;
+        left: -6px;
+    }
+
+    .hand-container .card-name {
+        font-size: 0.45rem;
+        margin-top: 0.4rem;
+    }
+
+    .hand-container .abilities {
+        display: none;
+    }
+
+    .hand-container .card-stats {
+        padding: 0.2rem;
+    }
+
+    .hand-container .card-attack,
+    .hand-container .card-health {
+        font-size: 0.65rem;
+    }
+
+    /* =============== */
+    /* GAME OVER SCREEN */
+    /* =============== */
+    #gameover-screen {
+        padding: 2rem 1rem;
+    }
+
+    #gameover-screen h2 {
+        font-size: 2rem;
+    }
+
+    #gameover-message {
+        font-size: 1rem;
+    }
+
+    #gameover-screen .btn {
+        min-height: 48px;
+    }
+
+    /* =============== */
+    /* TOOLTIPS */
+    /* =============== */
+    .card-tooltip {
+        max-width: 250px;
+        min-width: 200px;
+        padding: 0.9rem;
+    }
+
+    /* =============== */
+    /* TOUCH IMPROVEMENTS */
+    /* =============== */
+    button, .btn, a.btn, .tab-btn {
+        min-height: 44px;
+    }
+
+    /* Prevent text selection on game elements */
+    .card, .btn, .player-portrait, .land-card {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Target overlay */
+    .target-overlay-content {
+        padding: 1rem 2rem;
+    }
+
+    .target-overlay-content p {
+        font-size: 1rem;
+    }
+
+    /* Position slots */
+    .position-slot {
+        width: 50px;
+        height: 70px;
+    }
+
+    .position-slot span {
+        font-size: 1.75rem;
+    }
+
+    /* Card selection overlay */
+    .card-selection-overlay {
+        padding-top: 20px;
+    }
+
+    .card-selection-prompt {
+        padding: 1rem 1.5rem;
+        max-width: 90%;
+    }
+
+    .card-selection-prompt h3 {
+        font-size: 1.2rem;
+    }
+
+    .selection-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .selection-buttons .btn {
+        min-width: 100%;
+    }
+}
+
+/* ===================== */
+/* SMALL TABLETS / LARGE PHONES (max-width: 600px) */
+/* ===================== */
+
+@media (max-width: 600px) {
+    html, body {
+        font-size: 13px;
+    }
+
+    /* Navigation stacks completely */
+    .nav-bar {
+        padding: 0.5rem;
+    }
+
+    .nav-links a {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    /* Menu adjustments */
+    #menu-screen h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Rules screen adjustments */
+    #rules-screen h2 {
+        font-size: 1.35rem;
+    }
+
+    .rules-content h3 {
+        font-size: 1rem;
+    }
+
+    .rules-content h4 {
+        font-size: 0.9rem;
+    }
+
+    .rules-content li {
+        font-size: 0.8rem;
+    }
+
+    /* Smaller game elements */
+    .player-portrait {
+        width: 44px;
+        height: 44px;
+    }
+
+    .portrait-health {
+        font-size: 1.1rem;
+    }
+
+    .field-unit {
+        width: 48px;
+        height: 65px;
+    }
+
+    .hand-container .card {
+        width: 52px;
+        height: 72px;
+    }
+
+    .land-card {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* Tighter spacing */
+    .battlefield-zone {
+        min-height: 70px;
+    }
+
+    .hand-zone {
+        min-height: 85px;
+    }
+}
+
+/* ===================== */
+/* SMALL PHONES (max-width: 480px) */
+/* ===================== */
+
+@media (max-width: 480px) {
+    html, body {
+        font-size: 12px;
+    }
+
+    /* Auth container */
+    .auth-container {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 0;
+    }
+
+    .auth-container h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Navigation - very compact */
+    .nav-bar {
+        padding: 0.4rem 0.5rem;
+        gap: 0.4rem;
+    }
+
+    .nav-links {
+        gap: 0.15rem;
+    }
+
+    .nav-links a {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.75rem;
+        min-height: 32px;
+    }
+
+    .btn-logout {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.75rem;
+        min-height: 32px;
+    }
+
+    /* Menu */
+    #menu-screen h1 {
+        font-size: 1.35rem;
+    }
+
+    #menu-screen .subtitle {
+        font-size: 0.85rem;
+    }
+
+    /* Rules screen - very compact */
+    #rules-screen {
+        padding: 0.5rem;
+    }
+
+    #rules-screen h2 {
+        font-size: 1.2rem;
+    }
+
+    #rules-screen .btn {
+        min-height: 40px;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .rules-content h3 {
+        font-size: 0.95rem;
+        margin-top: 0.75rem;
+    }
+
+    .rules-content h4 {
+        font-size: 0.85rem;
+    }
+
+    .rules-content p {
+        font-size: 0.8rem;
+    }
+
+    .rules-content ul {
+        margin-left: 1rem;
+    }
+
+    .rules-content li {
+        font-size: 0.75rem;
+        margin: 0.2rem 0;
+    }
+
+    /* Game elements - most compact */
+    .player-bar {
+        padding: 0.3rem 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .player-portrait {
+        width: 40px;
+        height: 40px;
+    }
+
+    .portrait-health {
+        font-size: 1rem;
+    }
+
+    .stat {
+        font-size: 0.65rem;
+    }
+
+    .stat-icon {
+        font-size: 0.9rem;
+    }
+
+    .battlefield-zone {
+        min-height: 60px;
+        padding: 0.3rem;
+    }
+
+    .field-unit {
+        width: 42px;
+        height: 58px;
+    }
+
+    .field-unit .card-name {
+        font-size: 0.4rem;
+    }
+
+    .field-unit .card-attack,
+    .field-unit .card-health {
+        font-size: 0.55rem;
+    }
+
+    .lands-zone {
+        min-height: 32px;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .land-card {
+        width: 24px;
+        height: 24px;
+    }
+
+    .land-icon {
+        font-size: 0.75rem;
+    }
+
+    .btn-land-small {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.65rem;
+    }
+
+    .game-center-divider {
+        padding: 0.3rem 0.5rem;
+        gap: 0.75rem;
+    }
+
+    .turn-badge {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-end-turn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        min-width: 80px;
+    }
+
+    .hand-zone {
+        padding: 0.3rem;
+        min-height: 75px;
+    }
+
+    .hand-container .card {
+        width: 46px;
+        height: 64px;
+    }
+
+    .hand-container .card-cost {
+        width: 16px;
+        height: 16px;
+        font-size: 0.6rem;
+        top: -5px;
+        left: -5px;
+    }
+
+    .hand-container .card-name {
+        font-size: 0.4rem;
+    }
+
+    .hand-container .card-attack,
+    .hand-container .card-health {
+        font-size: 0.55rem;
+    }
+
+    /* Position slots smaller */
+    .position-slot {
+        width: 40px;
+        height: 55px;
+    }
+
+    .position-slot span {
+        font-size: 1.5rem;
+    }
+
+    /* Rules screen */
+    .rules-content h3 {
+        font-size: 1rem;
+    }
+
+    .rules-content li {
+        font-size: 0.85rem;
+    }
+
+    /* Lobby */
+    .lobby-details {
+        padding: 1rem;
+    }
+
+    .lobby-code {
+        font-size: 0.85rem;
+    }
+
+    /* Damage popups */
+    .damage-popup {
+        font-size: 1.75rem;
+    }
+
+    /* Game messages */
+    .game-message {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* ===================== */
+/* EXTRA SMALL PHONES (max-width: 360px) */
+/* ===================== */
+
+@media (max-width: 360px) {
+    html, body {
+        font-size: 11px;
+    }
+
+    .nav-links a {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    #menu-screen h1 {
+        font-size: 1.25rem;
+    }
+
+    .player-portrait {
+        width: 36px;
+        height: 36px;
+    }
+
+    .portrait-health {
+        font-size: 0.9rem;
+    }
+
+    .field-unit {
+        width: 38px;
+        height: 52px;
+    }
+
+    .hand-container .card {
+        width: 42px;
+        height: 58px;
+    }
+
+    .land-card {
+        width: 22px;
+        height: 22px;
+    }
+
+    .turn-badge {
+        font-size: 0.7rem;
+    }
+
+    .btn-end-turn {
+        font-size: 0.75rem;
+        min-width: 70px;
+    }
+}
+
+/* ===================== */
+/* CARD BUILDER RESPONSIVE */
+/* ===================== */
+
+@media (max-width: 1024px) {
+    .builder-main {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto 1fr;
+    }
+
+    .builder-main .card-preview-panel {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+    .builder-main .traits-panel,
+    .builder-main #panel-cards {
+        grid-row: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Card builder page - allow scrolling on mobile */
+    .card-builder-page {
+        overflow-y: auto;
+    }
+
+    .card-builder-page .builder-container {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+    }
+
+    .builder-container {
+        height: auto;
+        min-height: 100vh;
+        padding: 0.5rem;
+    }
+
+    .builder-main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 0.75rem;
+        overflow: visible;
+        flex: none;
+    }
+
+    .builder-main .card-preview-panel {
+        grid-column: auto;
+        grid-row: auto;
+    }
+
+    .builder-main .traits-panel,
+    .builder-main #panel-cards {
+        grid-row: auto;
+        max-height: 300px;
+    }
+
+    /* Card preview adjustments */
+    .card-preview-large {
+        width: 180px;
+        height: 250px;
+    }
+
+    .points-display {
+        padding: 0.75rem 1.25rem;
+    }
+
+    .points-value {
+        font-size: 2rem;
+    }
+
+    .sprite-selector {
+        max-width: 100%;
+    }
+
+    .sprite-grid {
+        grid-template-columns: repeat(6, 1fr);
+        max-height: 120px;
+    }
+
+    .sprite-item {
+        width: 40px;
+        height: 40px;
+    }
+
+    .stat-controls {
+        max-width: 100%;
+    }
+
+    .card-actions {
+        max-width: 100%;
+    }
+
+    /* Trait panel adjustments */
+    .traits-panel {
+        min-width: auto;
+    }
+
+    .trait-item {
+        padding: 0.5rem 0.6rem;
+    }
+
+    .trait-name {
+        font-size: 0.85rem;
+    }
+
+    .trait-desc {
+        font-size: 0.65rem;
+    }
+
+    /* Cards grid */
+    .cards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    }
+
+    .card-mini {
+        padding: 0.5rem;
+    }
+
+    .card-mini-name {
+        font-size: 0.7rem;
+    }
+
+    .card-mini-stats {
+        font-size: 0.7rem;
+    }
+}
+
+/* ===================== */
+/* DECK BUILDER RESPONSIVE */
+/* ===================== */
+
+@media (max-width: 1024px) {
+    .deck-builder-main {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .deck-builder-left {
+        grid-column: 1;
+    }
+
+    .deck-builder-main #panel-deck {
+        grid-column: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Deck builder page - allow scrolling on mobile */
+    .deck-builder-page {
+        overflow-y: auto;
+    }
+
+    .deck-builder-page .builder-container {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+    }
+
+    .deck-builder-main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        overflow: visible;
+        flex: none;
+    }
+
+    .deck-builder-left {
+        flex-direction: column;
+        gap: 0.5rem;
+        overflow: visible;
+    }
+
+    .deck-builder-left .panel {
+        flex: none;
+        max-height: none;
+        height: auto;
+        overflow: visible;
+    }
+
+    .deck-builder-left .panel .panel-content {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .deck-builder-left #panel-saved {
+        max-height: none;
+    }
+
+    .deck-builder-left #panel-saved .panel-content {
+        max-height: 150px;
+    }
+
+    .deck-builder-main #panel-deck {
+        grid-column: 1;
+        overflow: visible;
+    }
+
+    .deck-builder-page #panel-deck .panel-content {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .deck-stats {
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .deck-stat-value {
+        font-size: 1.5rem;
+    }
+
+    .deck-stat-label {
+        font-size: 0.65rem;
+    }
+
+    .deck-info-note {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .deck-builder-left .panel .panel-content {
+        max-height: 200px;
+    }
+
+    .deck-builder-left #panel-saved .panel-content {
+        max-height: 120px;
+    }
+
+    #panel-deck .panel-content {
+        max-height: 250px;
+    }
+}
+
+/* ===================== */
+/* LANDSCAPE PHONE ORIENTATION */
+/* ===================== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+    /* Compact everything for landscape phones */
+    .player-bar {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .player-portrait {
+        width: 36px;
+        height: 36px;
+    }
+
+    .battlefield-zone {
+        min-height: 55px;
+    }
+
+    .lands-zone {
+        min-height: 28px;
+    }
+
+    .game-center-divider {
+        padding: 0.25rem;
+    }
+
+    .hand-zone {
+        min-height: 65px;
+        padding: 0.25rem;
+    }
+
+    .hand-container .card {
+        width: 40px;
+        height: 55px;
+    }
+
+    .field-unit {
+        width: 40px;
+        height: 55px;
+    }
+}

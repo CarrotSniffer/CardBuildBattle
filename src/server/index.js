@@ -4,9 +4,12 @@ const WebSocket = require('ws');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const GameManager = require('./GameManager');
+const LobbyManager = require('./LobbyManager');
+const ServerBot = require('./ServerBot');
 const db = require('./database');
 const auth = require('./auth');
-const { validateCard, POSITIVE_TRAITS, NEGATIVE_TRAITS, POINT_BUDGET, BASE_STATS, STAT_COSTS } = require('../shared/pointSystem');
+const { validateCard, POSITIVE_TRAITS, NEGATIVE_TRAITS, POINT_BUDGET, BASE_STATS, STAT_COSTS, MAX_TRAITS } = require('../shared/pointSystem');
+const { CARD_SPRITES, getAvailableSprites, getSpriteById } = require('../shared/cardSprites');
 
 const app = express();
 const server = http.createServer(app);
@@ -34,8 +37,14 @@ auth.setupAuthRoutes(app);
 // Game manager instance
 const gameManager = new GameManager();
 
-// Connected players
+// Lobby manager instance
+const lobbyManager = new LobbyManager();
+
+// Connected players: playerId -> { ws, gameId, lobbyId, userId, username }
 const players = new Map();
+
+// Active bots: botId -> ServerBot instance
+const activeBots = new Map();
 
 // Health check endpoint for hosting platforms
 app.get('/health', (req, res) => {
@@ -48,11 +57,24 @@ app.get('/health', (req, res) => {
 app.get('/api/point-system', (req, res) => {
     res.json({
         budget: POINT_BUDGET,
+        maxTraits: MAX_TRAITS,
         baseStats: BASE_STATS,
         statCosts: STAT_COSTS,
         positiveTraits: POSITIVE_TRAITS,
         negativeTraits: NEGATIVE_TRAITS
     });
+});
+
+// Get available sprites for card (based on traits)
+app.get('/api/sprites', (req, res) => {
+    const traits = req.query.traits ? req.query.traits.split(',') : [];
+    const sprites = getAvailableSprites(traits);
+    res.json({ sprites });
+});
+
+// Get all sprites (for reference)
+app.get('/api/sprites/all', (req, res) => {
+    res.json({ sprites: CARD_SPRITES });
 });
 
 // Get user's cards
@@ -91,6 +113,15 @@ app.post('/api/cards', auth.authMiddleware, (req, res) => {
             });
         }
 
+        // Validate sprite if provided
+        if (cardData.spriteId) {
+            const sprite = getSpriteById(cardData.spriteId);
+            const availableSprites = getAvailableSprites(sortedTraits);
+            if (!availableSprites.find(s => s.id === cardData.spriteId)) {
+                return res.status(400).json({ error: 'Invalid sprite for card traits' });
+            }
+        }
+
         // Create card
         const card = db.createCard(req.user.id, {
             name: cardData.name,
@@ -98,7 +129,8 @@ app.post('/api/cards', auth.authMiddleware, (req, res) => {
             health: cardData.health,
             manaCost: cardData.manaCost,
             traits: sortedTraits,
-            pointTotal: validation.pointCost
+            pointTotal: validation.pointCost,
+            spriteId: cardData.spriteId || null
         });
 
         res.json({ card });
@@ -125,7 +157,8 @@ app.put('/api/cards/:id', auth.authMiddleware, (req, res) => {
             health: cardData.health,
             manaCost: cardData.manaCost,
             traits: cardData.traits || [],
-            pointTotal: validation.pointCost
+            pointTotal: validation.pointCost,
+            spriteId: cardData.spriteId || null
         });
 
         if (!success) {
@@ -266,6 +299,18 @@ function validateDeck(cardList, userId) {
     return { valid: errors.length === 0, errors };
 }
 
+// ===== LOBBY API ROUTES =====
+
+// Get open lobbies
+app.get('/api/lobbies', auth.authMiddleware, (req, res) => {
+    try {
+        const lobbies = lobbyManager.getOpenLobbies();
+        res.json({ lobbies });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ===== WEBSOCKET HANDLING =====
 
 wss.on('connection', (ws) => {
@@ -275,7 +320,7 @@ wss.on('connection', (ws) => {
     ws.isAlive = true;
     ws.on('pong', () => { ws.isAlive = true; });
 
-    players.set(playerId, { ws, gameId: null });
+    players.set(playerId, { ws, gameId: null, lobbyId: null, userId: null, username: null });
 
     console.log(`Player connected: ${playerId}`);
 
@@ -297,12 +342,26 @@ wss.on('connection', (ws) => {
     ws.on('close', () => {
         console.log(`Player disconnected: ${playerId}`);
         const player = players.get(playerId);
-        if (player && player.gameId) {
-            gameManager.handleDisconnect(playerId, player.gameId);
-            notifyOpponent(playerId, player.gameId, {
-                type: 'opponent_disconnected'
-            });
+
+        if (player) {
+            // Handle lobby disconnect
+            if (player.lobbyId) {
+                const result = lobbyManager.leaveLobby(player.lobbyId, playerId);
+                if (result && result.guestId && result.closed) {
+                    // Notify guest that host left
+                    sendToPlayer(result.guestId, { type: 'lobby_closed', message: 'Host left the lobby' });
+                }
+            }
+
+            // Handle game disconnect
+            if (player.gameId) {
+                gameManager.handleDisconnect(playerId, player.gameId);
+                notifyOpponent(playerId, player.gameId, {
+                    type: 'opponent_disconnected'
+                });
+            }
         }
+
         players.delete(playerId);
     });
 });
@@ -311,13 +370,46 @@ function handleMessage(playerId, data) {
     const player = players.get(playerId);
 
     switch (data.type) {
-        case 'find_game':
-            handleFindGame(playerId);
+        // ===== AUTHENTICATION =====
+        case 'authenticate':
+            // Link WebSocket to user account
+            player.userId = data.userId;
+            player.username = data.username;
+            sendToPlayer(playerId, { type: 'authenticated', username: data.username });
             break;
 
+        // ===== LOBBY SYSTEM =====
+        case 'create_lobby':
+            handleCreateLobby(playerId, data.deckId);
+            break;
+
+        case 'join_lobby':
+            handleJoinLobby(playerId, data.lobbyId, data.deckId);
+            break;
+
+        case 'leave_lobby':
+            handleLeaveLobby(playerId);
+            break;
+
+        case 'start_game':
+            handleStartGame(playerId);
+            break;
+
+        case 'get_lobbies':
+            sendToPlayer(playerId, {
+                type: 'lobby_list',
+                lobbies: lobbyManager.getOpenLobbies()
+            });
+            break;
+
+        case 'add_bot':
+            handleAddBot(playerId);
+            break;
+
+        // ===== GAME ACTIONS =====
         case 'play_card':
             if (player.gameId) {
-                const result = gameManager.playCard(player.gameId, playerId, data.cardId, data.target);
+                const result = gameManager.playCard(player.gameId, playerId, data.cardId, data.target, data.position);
                 if (result.success) {
                     broadcastGameState(player.gameId);
                 } else {
@@ -342,6 +434,9 @@ function handleMessage(playerId, data) {
                 const result = gameManager.attack(player.gameId, playerId, data.attackerId, data.target);
                 if (result.success) {
                     broadcastGameState(player.gameId);
+                    // Clear lastEvent after broadcast so it doesn't replay
+                    const game = gameManager.getGame(player.gameId);
+                    if (game) game.clearLastEvent();
                 } else {
                     sendToPlayer(playerId, { type: 'error', message: result.message });
                 }
@@ -359,9 +454,46 @@ function handleMessage(playerId, data) {
             }
             break;
 
-        case 'select_deck':
+        case 'confirm_card_selection':
             if (player.gameId) {
-                gameManager.selectDeck(player.gameId, playerId, data.deckId);
+                const result = gameManager.confirmCardSelection(player.gameId, playerId, data.selectedCardIds || []);
+                if (result.success) {
+                    // Send cycle animation data to the player who cycled
+                    if (result.cycleAnimation && (result.cycleAnimation.discardedCards.length > 0 || result.cycleAnimation.drawnCards.length > 0)) {
+                        sendToPlayer(playerId, {
+                            type: 'card_cycle_animation',
+                            discardedCards: result.cycleAnimation.discardedCards,
+                            drawnCards: result.cycleAnimation.drawnCards
+                        });
+                    }
+                    // Broadcast game state after a delay to allow animation
+                    setTimeout(() => {
+                        broadcastGameState(player.gameId);
+                    }, result.cycleAnimation && result.cycleAnimation.discardedCards.length > 0 ? 1500 : 0);
+                } else {
+                    sendToPlayer(playerId, { type: 'error', message: result.message });
+                }
+            }
+            break;
+
+        case 'skip_card_selection':
+            if (player.gameId) {
+                const result = gameManager.skipCardSelection(player.gameId, playerId);
+                if (result.success) {
+                    broadcastGameState(player.gameId);
+                } else {
+                    sendToPlayer(playerId, { type: 'error', message: result.message });
+                }
+            }
+            break;
+
+        case 'leave_game':
+            if (player.gameId) {
+                gameManager.handleDisconnect(playerId, player.gameId);
+                notifyOpponent(playerId, player.gameId, {
+                    type: 'opponent_left'
+                });
+                player.gameId = null;
             }
             break;
 
@@ -370,45 +502,288 @@ function handleMessage(playerId, data) {
     }
 }
 
-// Matchmaking queue
-const matchmakingQueue = [];
+// ===== LOBBY HANDLERS =====
 
-function handleFindGame(playerId) {
-    // Check if player is already in queue
-    if (matchmakingQueue.includes(playerId)) {
+function handleCreateLobby(playerId, deckId) {
+    const player = players.get(playerId);
+    if (!player || !player.username) {
+        sendToPlayer(playerId, { type: 'error', message: 'Please log in first' });
         return;
     }
 
-    // Add to queue
-    matchmakingQueue.push(playerId);
-    sendToPlayer(playerId, { type: 'searching' });
-
-    // If we have 2 players, create a game
-    if (matchmakingQueue.length >= 2) {
-        const player1Id = matchmakingQueue.shift();
-        const player2Id = matchmakingQueue.shift();
-
-        const gameId = gameManager.createGame(player1Id, player2Id);
-
-        players.get(player1Id).gameId = gameId;
-        players.get(player2Id).gameId = gameId;
-
-        // Notify both players
-        sendToPlayer(player1Id, {
-            type: 'game_found',
-            gameId,
-            opponent: 'Player 2'
-        });
-        sendToPlayer(player2Id, {
-            type: 'game_found',
-            gameId,
-            opponent: 'Player 1'
-        });
-
-        // Send initial game state
-        broadcastGameState(gameId);
+    if (!deckId) {
+        sendToPlayer(playerId, { type: 'error', message: 'Please select a deck' });
+        return;
     }
+
+    // Leave any existing lobby
+    if (player.lobbyId) {
+        lobbyManager.leaveLobby(player.lobbyId, playerId);
+    }
+
+    const lobby = lobbyManager.createLobby(playerId, player.username, deckId);
+    player.lobbyId = lobby.id;
+
+    sendToPlayer(playerId, {
+        type: 'lobby_created',
+        lobby: {
+            id: lobby.id,
+            hostName: lobby.hostName,
+            status: lobby.status
+        }
+    });
+
+    // Broadcast updated lobby list to all players
+    broadcastLobbyList();
 }
+
+function handleJoinLobby(playerId, lobbyId, deckId) {
+    const player = players.get(playerId);
+    if (!player || !player.username) {
+        sendToPlayer(playerId, { type: 'error', message: 'Please log in first' });
+        return;
+    }
+
+    if (!deckId) {
+        sendToPlayer(playerId, { type: 'error', message: 'Please select a deck' });
+        return;
+    }
+
+    // Leave any existing lobby
+    if (player.lobbyId) {
+        lobbyManager.leaveLobby(player.lobbyId, playerId);
+    }
+
+    const result = lobbyManager.joinLobby(lobbyId, playerId, player.username, deckId);
+
+    if (!result.success) {
+        sendToPlayer(playerId, { type: 'error', message: result.message });
+        return;
+    }
+
+    player.lobbyId = lobbyId;
+
+    // Notify both players
+    sendToPlayer(playerId, {
+        type: 'lobby_joined',
+        lobby: {
+            id: result.lobby.id,
+            hostName: result.lobby.hostName,
+            guestName: result.lobby.guestName,
+            status: result.lobby.status
+        }
+    });
+
+    // Notify host that guest joined
+    sendToPlayer(result.lobby.hostId, {
+        type: 'lobby_guest_joined',
+        guestName: player.username,
+        lobby: {
+            id: result.lobby.id,
+            hostName: result.lobby.hostName,
+            guestName: result.lobby.guestName,
+            status: result.lobby.status
+        }
+    });
+
+    // Broadcast updated lobby list
+    broadcastLobbyList();
+}
+
+function handleLeaveLobby(playerId) {
+    const player = players.get(playerId);
+    if (!player || !player.lobbyId) return;
+
+    const result = lobbyManager.leaveLobby(player.lobbyId, playerId);
+    player.lobbyId = null;
+
+    sendToPlayer(playerId, { type: 'lobby_left' });
+
+    if (result) {
+        if (result.closed && result.guestId) {
+            // Host left - notify guest
+            const guestPlayer = players.get(result.guestId);
+            if (guestPlayer) {
+                guestPlayer.lobbyId = null;
+                sendToPlayer(result.guestId, { type: 'lobby_closed', message: 'Host left the lobby' });
+            }
+        } else if (!result.closed && result.lobby) {
+            // Guest left - notify host
+            sendToPlayer(result.lobby.hostId, {
+                type: 'lobby_guest_left',
+                lobby: {
+                    id: result.lobby.id,
+                    hostName: result.lobby.hostName,
+                    status: result.lobby.status
+                }
+            });
+        }
+    }
+
+    // Broadcast updated lobby list
+    broadcastLobbyList();
+}
+
+function handleStartGame(playerId) {
+    const player = players.get(playerId);
+    if (!player || !player.lobbyId) {
+        sendToPlayer(playerId, { type: 'error', message: 'Not in a lobby' });
+        return;
+    }
+
+    const lobby = lobbyManager.getLobby(player.lobbyId);
+    if (!lobby) {
+        sendToPlayer(playerId, { type: 'error', message: 'Lobby not found' });
+        return;
+    }
+
+    if (lobby.hostId !== playerId) {
+        sendToPlayer(playerId, { type: 'error', message: 'Only the host can start the game' });
+        return;
+    }
+
+    if (lobby.status !== 'ready') {
+        sendToPlayer(playerId, { type: 'error', message: 'Waiting for opponent to join' });
+        return;
+    }
+
+    // Start the game
+    const startedLobby = lobbyManager.startGame(player.lobbyId);
+    if (!startedLobby) {
+        sendToPlayer(playerId, { type: 'error', message: 'Failed to start game' });
+        return;
+    }
+
+    // Check if guest is a bot
+    const guestPlayer = players.get(lobby.guestId);
+    const isGuestBot = guestPlayer && guestPlayer.isBot;
+
+    // Create the game - use bot's built-in deck if it's a bot game
+    let gameId;
+    if (isGuestBot) {
+        const bot = guestPlayer.botInstance;
+        gameId = gameManager.createGameWithBotDeck(
+            lobby.hostId,
+            lobby.guestId,
+            lobby.hostDeckId,
+            bot.getBotDeck(),
+            lobby.hostName,
+            lobby.guestName
+        );
+        bot.startGame(gameId);
+    } else {
+        gameId = gameManager.createGame(
+            lobby.hostId,
+            lobby.guestId,
+            lobby.hostDeckId,
+            lobby.guestDeckId,
+            lobby.hostName,
+            lobby.guestName
+        );
+    }
+
+    // Update player states
+    const hostPlayer = players.get(lobby.hostId);
+
+    if (hostPlayer) {
+        hostPlayer.gameId = gameId;
+        hostPlayer.lobbyId = null;
+    }
+    if (guestPlayer) {
+        guestPlayer.gameId = gameId;
+        guestPlayer.lobbyId = null;
+    }
+
+    // Notify both players
+    sendToPlayer(lobby.hostId, {
+        type: 'game_started',
+        gameId,
+        opponent: lobby.guestName
+    });
+    if (!isGuestBot) {
+        sendToPlayer(lobby.guestId, {
+            type: 'game_started',
+            gameId,
+            opponent: lobby.hostName
+        });
+    }
+
+    // Send initial game state
+    broadcastGameState(gameId);
+
+    // Clean up lobby
+    lobbyManager.deleteLobby(player.lobbyId);
+
+    // Broadcast updated lobby list
+    broadcastLobbyList();
+}
+
+function handleAddBot(playerId) {
+    const player = players.get(playerId);
+    if (!player || !player.lobbyId) {
+        sendToPlayer(playerId, { type: 'error', message: 'Not in a lobby' });
+        return;
+    }
+
+    const lobby = lobbyManager.getLobby(player.lobbyId);
+    if (!lobby) {
+        sendToPlayer(playerId, { type: 'error', message: 'Lobby not found' });
+        return;
+    }
+
+    if (lobby.hostId !== playerId) {
+        sendToPlayer(playerId, { type: 'error', message: 'Only the host can add a bot' });
+        return;
+    }
+
+    if (lobby.status !== 'waiting') {
+        sendToPlayer(playerId, { type: 'error', message: 'Lobby already has an opponent' });
+        return;
+    }
+
+    // Create a server-side bot
+    const bot = new ServerBot(gameManager, sendToPlayer, broadcastGameState);
+
+    // Register bot as a virtual player (no WebSocket)
+    players.set(bot.botId, {
+        ws: { readyState: 1, send: () => {} }, // Fake ws that does nothing
+        gameId: null,
+        lobbyId: player.lobbyId,
+        userId: bot.botId,
+        username: bot.botName,
+        isBot: true,
+        botInstance: bot
+    });
+
+    // Join the lobby as the bot
+    const result = lobbyManager.joinLobby(player.lobbyId, bot.botId, bot.botName, 'BOT_DECK');
+
+    if (!result.success) {
+        players.delete(bot.botId);
+        sendToPlayer(playerId, { type: 'error', message: 'Failed to add bot: ' + result.message });
+        return;
+    }
+
+    activeBots.set(bot.botId, bot);
+    console.log(`[Server] Bot ${bot.botName} added to lobby ${player.lobbyId}`);
+
+    // Notify host that bot joined
+    sendToPlayer(playerId, {
+        type: 'lobby_guest_joined',
+        guestName: bot.botName,
+        lobby: {
+            id: result.lobby.id,
+            hostName: result.lobby.hostName,
+            guestName: result.lobby.guestName,
+            status: result.lobby.status
+        }
+    });
+
+    // Broadcast updated lobby list
+    broadcastLobbyList();
+}
+
+// ===== UTILITY FUNCTIONS =====
 
 function sendToPlayer(playerId, data) {
     const player = players.get(playerId);
@@ -432,10 +807,30 @@ function broadcastGameState(gameId) {
     // Send personalized game state to each player (hide opponent's hand)
     [game.player1Id, game.player2Id].forEach(pId => {
         const state = gameManager.getGameStateForPlayer(gameId, pId);
-        sendToPlayer(pId, {
-            type: 'game_state',
-            state
-        });
+        const player = players.get(pId);
+
+        // Check if this player is a bot
+        if (player && player.isBot && player.botInstance) {
+            // Notify the bot of the game state
+            player.botInstance.onGameState(state);
+        } else {
+            sendToPlayer(pId, {
+                type: 'game_state',
+                state
+            });
+        }
+    });
+}
+
+function broadcastLobbyList() {
+    const lobbies = lobbyManager.getOpenLobbies();
+    players.forEach((player, playerId) => {
+        if (player.ws.readyState === WebSocket.OPEN) {
+            player.ws.send(JSON.stringify({
+                type: 'lobby_list',
+                lobbies
+            }));
+        }
     });
 }
 
@@ -447,6 +842,12 @@ const interval = setInterval(() => {
         ws.ping();
     });
 }, 30000);
+
+// Cleanup old lobbies every 5 minutes
+setInterval(() => {
+    lobbyManager.cleanup();
+    gameManager.cleanup();
+}, 5 * 60 * 1000);
 
 wss.on('close', () => {
     clearInterval(interval);

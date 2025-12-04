@@ -6,8 +6,9 @@
     <title>Deck Builder - Strategic Card Game</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/builder.css">
+    <link rel="stylesheet" href="css/mobile.css">
 </head>
-<body>
+<body class="deck-builder-page">
     <div class="builder-container">
         <!-- Navigation -->
         <nav class="nav-bar">
@@ -24,29 +25,42 @@
 
         <!-- Main Builder Area -->
         <div class="deck-builder-main">
-            <!-- Card Collection (Left) -->
-            <div class="panel">
-                <div class="panel-header">
-                    <h2>My Cards</h2>
-                    <span id="collection-count">0 cards</span>
+            <!-- Left: Card Collection + Saved Decks -->
+            <div class="deck-builder-left">
+                <!-- Card Collection -->
+                <div class="panel" id="panel-collection">
+                    <div class="panel-header">
+                        <h2>My Cards</h2>
+                        <span id="collection-count">0 cards</span>
+                    </div>
+                    <div class="panel-content">
+                        <div id="card-collection" class="cards-grid"></div>
+                    </div>
                 </div>
-                <div class="panel-content">
-                    <div id="card-collection" class="cards-grid"></div>
+
+                <!-- Saved Decks -->
+                <div class="panel" id="panel-saved">
+                    <div class="panel-header">
+                        <h2>Saved Decks</h2>
+                    </div>
+                    <div class="panel-content">
+                        <div id="saved-decks" class="deck-list"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Deck Panel (Right) -->
-            <div class="panel">
+            <!-- Right: Current Deck -->
+            <div class="panel" id="panel-deck">
                 <div class="panel-header">
                     <h2>Current Deck</h2>
                     <button class="btn btn-secondary" onclick="newDeck()">New Deck</button>
                 </div>
 
                 <!-- Deck Name -->
-                <div class="form-group" style="margin-bottom: 1rem;">
+                <div class="form-group" style="margin-bottom: 1rem; padding: 0 0.5rem;">
                     <input type="text" id="deck-name" class="card-name-input"
                            placeholder="Deck Name" maxlength="30"
-                           style="text-align: left; border: 2px solid var(--card-border); border-radius: 6px; padding: 0.5rem;">
+                           style="text-align: left; border: 2px solid var(--card-border); border-radius: 6px; padding: 0.75rem; width: 100%; box-sizing: border-box; font-size: 16px;">
                 </div>
 
                 <!-- Deck Stats -->
@@ -57,15 +71,15 @@
                     </div>
                     <div class="deck-stat">
                         <div id="deck-unique-count" class="deck-stat-value">0</div>
-                        <div class="deck-stat-label">Unique</div>
+                        <div class="deck-stat-label">Unique (5 min)</div>
                     </div>
                     <div class="deck-stat">
                         <div id="deck-avg-mana" class="deck-stat-value">0</div>
                         <div class="deck-stat-label">Avg Mana</div>
                     </div>
                 </div>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                    + 7 Mana Lands added automatically = 32 total
+                <p class="deck-info-note">
+                    + 7 Mana Lands added automatically at game start
                 </p>
 
                 <!-- Deck Validation -->
@@ -80,12 +94,6 @@
                 <div class="card-actions">
                     <button id="save-deck-btn" class="btn btn-primary" onclick="saveDeck()">Save Deck</button>
                     <button id="delete-deck-btn" class="btn btn-secondary" onclick="deleteDeck()" style="display: none;">Delete</button>
-                </div>
-
-                <!-- Saved Decks -->
-                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--card-border);">
-                    <h3 style="margin-bottom: 0.5rem;">Saved Decks</h3>
-                    <div id="saved-decks" class="deck-list"></div>
                 </div>
             </div>
         </div>

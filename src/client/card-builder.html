@@ -6,8 +6,9 @@
     <title>Card Builder - Strategic Card Game</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/builder.css">
+    <link rel="stylesheet" href="css/mobile.css">
 </head>
-<body>
+<body class="card-builder-page">
     <div class="builder-container">
         <!-- Navigation -->
         <nav class="nav-bar">
@@ -25,27 +26,25 @@
         <!-- Main Builder Area -->
         <div class="builder-main">
             <!-- Traits Panel (Left) -->
-            <div class="panel traits-panel">
+            <div class="panel traits-panel" id="panel-traits">
                 <div class="panel-header">
                     <h2>Traits</h2>
                 </div>
                 <div class="panel-content">
-                    <div class="traits-section">
-                        <h3>Positive Traits (Cost Points)</h3>
-                        <div id="positive-traits" class="traits-list"></div>
-                    </div>
-                    <div class="traits-section">
-                        <h3>Negative Traits (Give Points)</h3>
-                        <div id="negative-traits" class="traits-list"></div>
+                    <div id="traits-container" class="traits-container">
+                        <!-- Trait categories will be rendered here by JS -->
                     </div>
                 </div>
             </div>
 
             <!-- Card Preview Panel (Center) -->
-            <div class="panel card-preview-panel">
+            <div class="panel card-preview-panel" id="panel-editor">
                 <div class="panel-header">
                     <h2>Card Editor</h2>
-                    <button class="btn btn-secondary" onclick="resetCard()">Reset</button>
+                    <div class="panel-header-buttons">
+                        <button class="btn btn-action" onclick="randomizeCard()">Randomize</button>
+                        <button class="btn btn-secondary" onclick="resetCard()">Reset</button>
+                    </div>
                 </div>
 
                 <!-- Points Display -->
@@ -57,17 +56,31 @@
                 <!-- Card Preview -->
                 <div class="card-preview-large" style="position: relative;">
                     <div id="card-mana-display" class="card-cost">2</div>
+
+                    <!-- Sprite Icon -->
+                    <div id="card-sprite-display" class="card-sprite">
+                        <span class="sprite-icon">?</span>
+                    </div>
+
                     <input type="text" id="card-name" class="card-name-input"
                            placeholder="Card Name" maxlength="20">
 
                     <!-- Active Traits -->
                     <div id="active-traits" class="active-traits">
-                        <span class="empty-traits-hint">Drag traits here</span>
+                        <span class="empty-traits-hint">Tap traits to add (max 3)</span>
                     </div>
 
                     <div class="card-stats-row">
                         <span class="card-stat attack">&#9876; <span id="attack-display">1</span></span>
                         <span class="card-stat health">&#9829; <span id="health-display">1</span></span>
+                    </div>
+                </div>
+
+                <!-- Sprite Selection -->
+                <div class="sprite-selector">
+                    <h3>Choose Icon</h3>
+                    <div id="sprite-grid" class="sprite-grid">
+                        <!-- Sprites will be rendered here -->
                     </div>
                 </div>
 
@@ -100,7 +113,7 @@
             </div>
 
             <!-- My Cards Panel (Right) -->
-            <div class="panel">
+            <div class="panel" id="panel-cards">
                 <div class="panel-header">
                     <h2>My Cards</h2>
                     <span id="card-count">0 cards</span>

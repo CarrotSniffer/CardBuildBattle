@@ -4,6 +4,7 @@
  */
 
 const POINT_BUDGET = 10;
+const MAX_TRAITS = 3;
 
 // Base stats for a new card
 const BASE_STATS = {
@@ -38,7 +39,7 @@ const POSITIVE_TRAITS = {
     ranged: {
         id: 'ranged',
         name: 'Ranged',
-        cost: 3,
+        cost: 4,
         description: 'Attacks without receiving counter-damage',
         effect: 'ranged'
     },
@@ -52,7 +53,7 @@ const POSITIVE_TRAITS = {
     charge: {
         id: 'charge',
         name: 'Charge',
-        cost: 4,
+        cost: 3,
         description: 'Deals double damage when attacking',
         effect: 'charge'
     },
@@ -73,23 +74,115 @@ const POSITIVE_TRAITS = {
     inspire: {
         id: 'inspire',
         name: 'Inspire',
-        cost: 3,
+        cost: 2,
         description: 'Adjacent allies gain +1/+1',
         effect: 'inspire'
     },
     regenerate: {
         id: 'regenerate',
         name: 'Regenerate',
-        cost: 3,
+        cost: 2,
         description: 'Heals 1 health at the start of your turn',
         effect: 'regenerate'
     },
     piercing: {
         id: 'piercing',
         name: 'Piercing',
-        cost: 3,
+        cost: 4,
         description: 'Excess damage hits the enemy hero',
         effect: 'piercing'
+    },
+    stealth: {
+        id: 'stealth',
+        name: 'Stealth',
+        cost: 4,
+        description: 'Cannot be targeted until it attacks',
+        effect: 'stealth'
+    },
+    deathtouch: {
+        id: 'deathtouch',
+        name: 'Deathtouch',
+        cost: 4,
+        description: 'Destroys any unit it damages',
+        effect: 'deathtouch'
+    },
+    frenzy: {
+        id: 'frenzy',
+        name: 'Frenzy',
+        cost: 3,
+        description: 'Can attack twice per turn',
+        effect: 'frenzy'
+    },
+    // New positive traits
+    thorns: {
+        id: 'thorns',
+        name: 'Thorns',
+        cost: 2,
+        description: 'Deals 1 damage to attackers',
+        effect: 'thorns'
+    },
+    rally: {
+        id: 'rally',
+        name: 'Rally',
+        cost: 3,
+        description: 'All allies gain +1 attack when played',
+        effect: 'rally'
+    },
+    guardian: {
+        id: 'guardian',
+        name: 'Guardian',
+        cost: 2,
+        description: 'Adjacent allies take 1 less damage',
+        effect: 'guardian'
+    },
+    vampiric: {
+        id: 'vampiric',
+        name: 'Vampiric',
+        cost: 3,
+        description: 'Gains +1/+1 when it kills a unit',
+        effect: 'vampiric'
+    },
+    retaliate: {
+        id: 'retaliate',
+        name: 'Retaliate',
+        cost: 2,
+        description: 'Deals double counter-attack damage',
+        effect: 'retaliate'
+    },
+    elusive: {
+        id: 'elusive',
+        name: 'Elusive',
+        cost: 3,
+        description: 'Can only be blocked by units with 3+ attack',
+        effect: 'elusive'
+    },
+    leech: {
+        id: 'leech',
+        name: 'Leech',
+        cost: 2,
+        description: 'Drains 1 mana from opponent when attacking hero',
+        effect: 'leech'
+    },
+    undying: {
+        id: 'undying',
+        name: 'Undying',
+        cost: 4,
+        description: 'Returns to hand when destroyed (once)',
+        effect: 'undying'
+    },
+    overpower: {
+        id: 'overpower',
+        name: 'Overpower',
+        cost: 2,
+        description: 'Ignores armor trait',
+        effect: 'overpower'
+    },
+    warcry: {
+        id: 'warcry',
+        name: 'Warcry',
+        cost: 2,
+        description: 'Gains +2 attack on the turn it is played',
+        effect: 'warcry'
     }
 };
 
@@ -112,7 +205,7 @@ const NEGATIVE_TRAITS = {
     fragile: {
         id: 'fragile',
         name: 'Fragile',
-        cost: -1,
+        cost: -2,
         description: 'Takes double damage',
         effect: 'fragile'
     },
@@ -133,14 +226,14 @@ const NEGATIVE_TRAITS = {
     soulbound: {
         id: 'soulbound',
         name: 'Soulbound',
-        cost: -3,
+        cost: -2,
         description: 'When this dies, lose 3 health',
         effect: 'soulbound'
     },
     volatile: {
         id: 'volatile',
         name: 'Volatile',
-        cost: -2,
+        cost: -3,
         description: 'Dies at the end of your turn',
         effect: 'volatile'
     },
@@ -150,6 +243,77 @@ const NEGATIVE_TRAITS = {
         cost: -2,
         description: 'Cannot attack heroes directly',
         effect: 'pacifist'
+    },
+    // New negative traits
+    cursed: {
+        id: 'cursed',
+        name: 'Cursed',
+        cost: -2,
+        description: 'Cannot be healed or buffed',
+        effect: 'cursed'
+    },
+    clumsy: {
+        id: 'clumsy',
+        name: 'Clumsy',
+        cost: -1,
+        description: 'Has a 25% chance to miss attacks',
+        effect: 'clumsy'
+    },
+    cowardly: {
+        id: 'cowardly',
+        name: 'Cowardly',
+        cost: -2,
+        description: 'Cannot attack units with higher attack',
+        effect: 'cowardly'
+    },
+    reckless: {
+        id: 'reckless',
+        name: 'Reckless',
+        cost: -1,
+        description: 'Must attack each turn if able',
+        effect: 'reckless'
+    },
+    doomed: {
+        id: 'doomed',
+        name: 'Doomed',
+        cost: -2,
+        description: 'Dies after 3 turns on field',
+        effect: 'doomed'
+    },
+    vengeful: {
+        id: 'vengeful',
+        name: 'Vengeful',
+        cost: -1,
+        description: 'Deals 2 damage to your hero when destroyed',
+        effect: 'vengeful'
+    },
+    exposed: {
+        id: 'exposed',
+        name: 'Exposed',
+        cost: -2,
+        description: 'Takes +1 damage from all sources',
+        effect: 'exposed'
+    },
+    draining: {
+        id: 'draining',
+        name: 'Draining',
+        cost: -2,
+        description: 'Costs 1 mana each turn to keep alive',
+        effect: 'draining'
+    },
+    disloyal: {
+        id: 'disloyal',
+        name: 'Disloyal',
+        cost: -3,
+        description: 'Switches sides if opponent has more units',
+        effect: 'disloyal'
+    },
+    brittle: {
+        id: 'brittle',
+        name: 'Brittle',
+        cost: -1,
+        description: 'Loses 1 attack each turn',
+        effect: 'brittle'
     }
 };
 
@@ -164,11 +328,23 @@ function calculatePointCost(cardData) {
 
     // Stat costs (difference from base)
     const attackDiff = cardData.attack - BASE_STATS.attack;
-    const healthDiff = cardData.health - BASE_STATS.health;
     const manaDiff = BASE_STATS.manaCost - cardData.manaCost; // Inverted: lower mana = more cost
 
     cost += attackDiff * STAT_COSTS.attack;
-    cost += healthDiff * STAT_COSTS.health;
+
+    // Health scaling: 1-5 costs 1 pt each, 6+ costs 2 pts each
+    const health = cardData.health;
+    const baseHealth = BASE_STATS.health;
+    if (health <= 5) {
+        cost += (health - baseHealth) * STAT_COSTS.health;
+    } else {
+        // First 4 points (2-5) cost 1 each, rest cost 2 each
+        const cheapHealth = Math.max(0, 5 - baseHealth); // 4 pts at 1 cost each
+        const expensiveHealth = health - 5; // remaining pts at 2 cost each
+        cost += cheapHealth * STAT_COSTS.health;
+        cost += expensiveHealth * 2;
+    }
+
     cost += manaDiff * Math.abs(STAT_COSTS.manaCost);
 
     // Trait costs
@@ -232,6 +408,11 @@ function validateCard(cardData) {
         if (hasSwift && hasSlow) {
             errors.push('Cannot have both Swift and Slow');
         }
+
+        // Check max traits limit
+        if (cardData.traits.length > MAX_TRAITS) {
+            errors.push(`Card can have at most ${MAX_TRAITS} traits`);
+        }
     }
 
     // Check point budget
@@ -273,6 +454,7 @@ function getFinalManaCost(cardData) {
 
 module.exports = {
     POINT_BUDGET,
+    MAX_TRAITS,
     BASE_STATS,
     STAT_COSTS,
     POSITIVE_TRAITS,

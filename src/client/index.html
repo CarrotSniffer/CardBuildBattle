@@ -6,13 +6,14 @@
     <title>Strategic Card Game</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/builder.css">
+    <link rel="stylesheet" href="css/mobile.css">
 </head>
 <body>
     <div id="app">
         <!-- Main Menu Screen -->
         <div id="menu-screen" class="screen active">
             <!-- Navigation -->
-            <nav class="nav-bar" style="position: absolute; top: 1rem; left: 1rem; right: 1rem;">
+            <nav class="nav-bar">
                 <div class="nav-links">
                     <a href="/" class="active">Play</a>
                     <a href="/card-builder.html">Card Builder</a>
@@ -28,26 +29,59 @@
             <p class="subtitle">A game of pure strategy - no luck involved</p>
 
             <!-- Deck Selection -->
-            <div id="deck-selection" style="margin-bottom: 1rem;">
-                <label style="color: var(--text-secondary);">Select Deck:</label>
+            <div id="deck-selection" class="deck-selection-box">
+                <label>Select Your Deck:</label>
                 <select id="deck-select" class="deck-selector">
                     <option value="">-- Select a deck --</option>
                 </select>
             </div>
 
-            <div class="menu-buttons">
-                <button id="find-game-btn" class="btn btn-primary" disabled>Find Match</button>
+            <p id="no-deck-warning" class="warning-text" style="display: none;">
+                You need to <a href="/card-builder.html">create cards</a> and
+                <a href="/deck-builder.html">build a deck</a> to play!
+            </p>
+
+            <!-- Lobby Actions -->
+            <div class="lobby-actions">
+                <button id="create-lobby-btn" class="btn btn-primary" disabled>Create Game</button>
+                <button id="refresh-lobbies-btn" class="btn btn-secondary">Refresh</button>
                 <button id="how-to-play-btn" class="btn btn-secondary">How to Play</button>
             </div>
-            <div id="searching-status" class="hidden">
-                <div class="spinner"></div>
-                <p>Searching for opponent...</p>
-                <button id="cancel-search-btn" class="btn btn-secondary">Cancel</button>
+
+            <!-- Lobby Browser -->
+            <div class="lobby-browser">
+                <h3>Open Games</h3>
+                <div id="lobby-list" class="lobby-list">
+                    <p class="no-lobbies">No open lobbies. Create one to start playing!</p>
+                </div>
             </div>
-            <p id="no-deck-warning" style="color: var(--warning-color); margin-top: 1rem;">
-                You need to <a href="/card-builder.html" style="color: var(--primary-color);">create cards</a> and
-                <a href="/deck-builder.html" style="color: var(--primary-color);">build a deck</a> to play!
-            </p>
+        </div>
+
+        <!-- Lobby Waiting Screen -->
+        <div id="lobby-screen" class="screen">
+            <h2>Game Lobby</h2>
+            <div class="lobby-details">
+                <p class="lobby-code">Lobby Code: <strong id="lobby-id-display"></strong></p>
+
+                <div class="lobby-players">
+                    <div class="lobby-player">
+                        <span class="player-label">Host:</span>
+                        <span id="lobby-host-name" class="player-name"></span>
+                    </div>
+                    <div class="lobby-player">
+                        <span class="player-label">Opponent:</span>
+                        <span id="lobby-guest-name" class="player-name waiting">Waiting...</span>
+                    </div>
+                </div>
+
+                <p id="lobby-status" class="lobby-status">Waiting for an opponent to join...</p>
+
+                <div class="lobby-buttons">
+                    <button id="add-bot-btn" class="btn btn-action" style="display: none;">Add Bot</button>
+                    <button id="start-game-btn" class="btn btn-primary" disabled>Start Game</button>
+                    <button id="leave-lobby-btn" class="btn btn-secondary">Leave Lobby</button>
+                </div>
+            </div>
         </div>
 
         <!-- How to Play Screen -->
@@ -59,36 +93,49 @@
 
                 <h3>Game Flow</h3>
                 <ul>
-                    <li>Each player starts with 30 health, 4 cards, and 7 lands</li>
+                    <li>Each player starts with 30 health and 4 cards</li>
                     <li>Player 2 draws an extra card to compensate for going second</li>
                     <li>Each turn you gain 1 base mana (up to 5) and draw 1 card</li>
-                    <li>Play cards by spending mana, then attack with your units</li>
+                    <li>Play cards from your hand by spending mana</li>
+                    <li>Attack with your units, then end your turn</li>
                 </ul>
 
                 <h3>Mana Lands</h3>
                 <ul>
-                    <li>Base mana grows each turn up to 5</li>
-                    <li>Each deck includes 7 Mana Lands automatically</li>
-                    <li>Play additional lands for 1 mana each</li>
-                    <li>Max mana = Base mana + Number of lands (up to 12)</li>
-                    <li>Lands have health and can be attacked by enemies!</li>
+                    <li>Base mana grows each turn: 1 → 2 → ... → 10 (cap)</li>
+                    <li>Each player has a pool of 7 lands (separate from deck)</li>
+                    <li>Play lands anytime from your pool for 1 mana</li>
+                    <li>Each land on the field adds +1 to your max mana</li>
+                    <li>Max mana = Base mana + Lands on field (up to 17)</li>
+                    <li>Lands have 5 health and can be attacked!</li>
                     <li>Destroying enemy lands reduces their mana income</li>
                 </ul>
 
-                <h3>Card Types</h3>
-                <ul>
-                    <li><strong>Units:</strong> Creatures that can attack and defend</li>
-                    <li><strong>Spells:</strong> One-time effects</li>
-                    <li><strong>Structures:</strong> Persistent effects on the field</li>
-                </ul>
-
-                <h3>Unit Abilities</h3>
+                <h3>Unit Traits</h3>
+                <h4>Positive Traits (cost points)</h4>
                 <ul>
                     <li><strong>Swift:</strong> Can attack immediately when played</li>
                     <li><strong>Taunt:</strong> Enemies must attack this unit first</li>
                     <li><strong>Ranged:</strong> Attacks without receiving counter-damage</li>
                     <li><strong>Armor:</strong> Takes 1 less damage from all sources</li>
-                    <li><strong>Charge:</strong> Deals double damage when attacking</li>
+                    <li><strong>Charge:</strong> Deals DOUBLE damage when attacking</li>
+                    <li><strong>Lifesteal:</strong> Heal your hero equal to damage dealt</li>
+                    <li><strong>Divine Shield:</strong> Blocks the first instance of damage</li>
+                    <li><strong>Inspire:</strong> Adjacent allies get +1/+1 at end of turn</li>
+                    <li><strong>Piercing:</strong> Excess damage to units hits the enemy hero</li>
+                    <li><strong>Regenerate:</strong> Heals 1 health at start of your turn</li>
+                </ul>
+
+                <h4>Negative Traits (refund points)</h4>
+                <ul>
+                    <li><strong>Frail:</strong> Dies to ANY damage (1 damage = death)</li>
+                    <li><strong>Slow:</strong> Cannot attack for 1 turn after playing</li>
+                    <li><strong>Fragile:</strong> Takes DOUBLE damage</li>
+                    <li><strong>Costly:</strong> Costs 2 more mana</li>
+                    <li><strong>Exhausting:</strong> Lose 2 mana next turn</li>
+                    <li><strong>Soulbound:</strong> You lose 3 health when this dies</li>
+                    <li><strong>Volatile:</strong> Dies at the end of your turn</li>
+                    <li><strong>Pacifist:</strong> Can only attack enemy units (not heroes or lands)</li>
                 </ul>
 
                 <h3>No Luck Elements</h3>
@@ -99,65 +146,101 @@
 
         <!-- Game Screen -->
         <div id="game-screen" class="screen">
-            <!-- Opponent Area -->
-            <div id="opponent-area" class="player-area opponent">
-                <div class="player-info">
-                    <div class="health-display">
-                        <span class="health-icon">♥</span>
-                        <span id="opponent-health">30</span>
+            <!-- Opponent Section (Top) -->
+            <div class="game-opponent-section">
+                <!-- Opponent Info Bar -->
+                <div class="player-bar opponent-bar">
+                    <div class="player-portrait opponent-portrait" id="opponent-hero-target">
+                        <div class="portrait-health">
+                            <span id="opponent-health">30</span>
+                        </div>
+                        <div class="portrait-name" id="opponent-name-display">Opponent</div>
                     </div>
-                    <div class="mana-display">
-                        <span class="mana-icon">◆</span>
-                        <span id="opponent-mana">1/1</span>
-                    </div>
-                    <div class="deck-count">
-                        <span class="deck-icon">📚</span>
-                        <span id="opponent-deck">20</span>
-                    </div>
-                    <div class="hand-count">
-                        <span class="hand-icon">🃏</span>
-                        <span id="opponent-hand-count">4</span>
+                    <div class="player-stats">
+                        <div class="stat mana-stat">
+                            <span class="stat-icon">&#9670;</span>
+                            <span id="opponent-mana">1/1</span>
+                        </div>
+                        <div class="stat deck-stat">
+                            <span class="stat-icon">&#9639;</span>
+                            <span id="opponent-deck">20</span>
+                        </div>
+                        <div class="stat hand-stat">
+                            <span class="stat-icon">&#9643;</span>
+                            <span id="opponent-hand-count">4</span> cards
+                        </div>
                     </div>
                 </div>
-                <div id="opponent-lands" class="lands-row"></div>
-                <div id="opponent-structures" class="structures-row"></div>
-                <div id="opponent-field" class="field-row"></div>
+
+                <!-- Opponent Lands -->
+                <div class="lands-zone opponent-lands-zone">
+                    <div id="opponent-lands" class="lands-container"></div>
+                </div>
+
+                <!-- Opponent Field -->
+                <div class="battlefield-zone opponent-zone">
+                    <div id="opponent-field" class="units-container"></div>
+                </div>
             </div>
 
-            <!-- Center Area -->
-            <div id="center-area">
-                <div id="turn-indicator">
-                    <span id="turn-text">Your Turn</span>
-                    <span id="turn-number">Turn 1</span>
+            <!-- Center Divider / Turn Info -->
+            <div class="game-center-divider">
+                <div class="turn-indicator-container" id="turn-indicator-container">
+                    <div id="turn-indicator" class="turn-badge">
+                        <span id="turn-text">Your Turn</span>
+                    </div>
+                    <span id="turn-number" class="turn-number">Turn 1</span>
                 </div>
-                <button id="end-turn-btn" class="btn btn-action">End Turn</button>
+                <button id="end-turn-btn" class="btn btn-end-turn">End Turn</button>
             </div>
 
-            <!-- Player Area -->
-            <div id="player-area" class="player-area player">
-                <div id="player-field" class="field-row"></div>
-                <div id="player-structures" class="structures-row"></div>
-                <div id="player-lands" class="lands-row"></div>
-                <div class="player-info">
-                    <div class="health-display">
-                        <span class="health-icon">♥</span>
-                        <span id="player-health">30</span>
-                    </div>
-                    <div class="mana-display">
-                        <span class="mana-icon">◆</span>
-                        <span id="player-mana">1/1</span>
-                    </div>
-                    <div class="lands-display">
-                        <span class="lands-icon">🏔️</span>
-                        <span id="player-lands-count">0</span>
-                    </div>
-                    <div class="deck-count">
-                        <span class="deck-icon">📚</span>
-                        <span id="player-deck">20</span>
-                    </div>
-                    <button id="play-land-btn" class="btn btn-land" title="Play a Mana Land (Cost: 1)">+ Land</button>
+            <!-- Player Section (Bottom) -->
+            <div class="game-player-section">
+                <!-- Player Field -->
+                <div class="battlefield-zone player-zone">
+                    <div id="player-field" class="units-container"></div>
                 </div>
-                <div id="player-hand" class="hand-row"></div>
+
+                <!-- Player Lands -->
+                <div class="lands-zone player-lands-zone">
+                    <div id="player-lands" class="lands-container"></div>
+                    <button id="play-land-btn" class="btn btn-land-small" title="Play a Mana Land (Cost: 1)">+ Land</button>
+                </div>
+
+                <!-- Player Info Bar -->
+                <div class="player-bar player-bar-bottom">
+                    <div class="player-portrait player-portrait-self" id="player-hero">
+                        <div class="portrait-health">
+                            <span id="player-health">30</span>
+                        </div>
+                        <div class="portrait-name" id="player-name-display">You</div>
+                    </div>
+                    <div class="player-stats">
+                        <div class="stat mana-stat">
+                            <span class="stat-icon">&#9670;</span>
+                            <span id="player-mana">1/1</span>
+                        </div>
+                        <div class="stat deck-stat">
+                            <span class="stat-icon">&#9639;</span>
+                            <span id="player-deck">20</span>
+                        </div>
+                        <div class="stat lands-stat">
+                            <span class="stat-icon">&#9632;</span>
+                            <span id="player-lands-count">7</span> lands
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Hand -->
+                <div class="hand-zone">
+                    <div id="player-hand" class="hand-container"></div>
+                </div>
+            </div>
+
+            <!-- Event Log (Side Panel) -->
+            <div id="event-log-panel" class="event-log-panel">
+                <div class="event-log-header">Battle Log</div>
+                <div id="event-log" class="event-log-content"></div>
             </div>
 
             <!-- Game Messages -->
@@ -165,7 +248,7 @@
 
             <!-- Target Selection Overlay -->
             <div id="target-overlay" class="hidden">
-                <div class="overlay-content">
+                <div class="target-overlay-content">
                     <p id="target-prompt">Select a target</p>
                     <button id="cancel-target-btn" class="btn btn-secondary">Cancel</button>
                 </div>
