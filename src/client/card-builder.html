@@ -6,8 +6,9 @@
     <title>Card Builder - Strategic Card Game</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/builder.css">
+    <link rel="stylesheet" href="css/mobile.css">
 </head>
-<body>
+<body class="card-builder-page">
     <div class="builder-container">
         <!-- Navigation -->
         <nav class="nav-bar">
@@ -25,7 +26,7 @@
         <!-- Main Builder Area -->
         <div class="builder-main">
             <!-- Traits Panel (Left) -->
-            <div class="panel traits-panel">
+            <div class="panel traits-panel" id="panel-traits">
                 <div class="panel-header">
                     <h2>Traits</h2>
                 </div>
@@ -37,10 +38,13 @@
             </div>
 
             <!-- Card Preview Panel (Center) -->
-            <div class="panel card-preview-panel">
+            <div class="panel card-preview-panel" id="panel-editor">
                 <div class="panel-header">
                     <h2>Card Editor</h2>
-                    <button class="btn btn-secondary" onclick="resetCard()">Reset</button>
+                    <div class="panel-header-buttons">
+                        <button class="btn btn-action" onclick="randomizeCard()">Randomize</button>
+                        <button class="btn btn-secondary" onclick="resetCard()">Reset</button>
+                    </div>
                 </div>
 
                 <!-- Points Display -->
@@ -63,7 +67,7 @@
 
                     <!-- Active Traits -->
                     <div id="active-traits" class="active-traits">
-                        <span class="empty-traits-hint">Drag traits here (max 3)</span>
+                        <span class="empty-traits-hint">Tap traits to add (max 3)</span>
                     </div>
 
                     <div class="card-stats-row">
@@ -109,7 +113,7 @@
             </div>
 
             <!-- My Cards Panel (Right) -->
-            <div class="panel">
+            <div class="panel" id="panel-cards">
                 <div class="panel-header">
                     <h2>My Cards</h2>
                     <span id="card-count">0 cards</span>

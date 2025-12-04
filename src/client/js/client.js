@@ -76,7 +76,8 @@ class GameClient {
         if (!Auth.requireAuth()) return;
 
         // Display username
-        document.getElementById('username-display').textContent = Auth.user.username;
+        const usernameDisplay = document.getElementById('username-display');
+        if (usernameDisplay) usernameDisplay.textContent = Auth.user.username;
 
         // Load user's decks
         await this.loadDecks();
@@ -269,16 +270,18 @@ class GameClient {
         const warning = document.getElementById('no-deck-warning');
         const createBtn = document.getElementById('create-lobby-btn');
 
-        // Clear existing options (keep first placeholder)
+        if (!select) return;
+
+        // Clear existing options
         select.innerHTML = '<option value="">-- Select a deck --</option>';
 
         if (this.myDecks.length === 0) {
-            warning.style.display = 'block';
-            createBtn.disabled = true;
+            if (warning) warning.style.display = 'block';
+            if (createBtn) createBtn.disabled = true;
             return;
         }
 
-        warning.style.display = 'none';
+        if (warning) warning.style.display = 'none';
 
         this.myDecks.forEach(deck => {
             const total = deck.cardList.reduce((sum, c) => sum + c.count, 0);
@@ -288,10 +291,9 @@ class GameClient {
             select.appendChild(option);
         });
 
-        // Enable create lobby if a deck is selected
         select.addEventListener('change', () => {
             this.selectedDeckId = select.value || null;
-            createBtn.disabled = !this.selectedDeckId;
+            if (createBtn) createBtn.disabled = !this.selectedDeckId;
         });
     }
 
@@ -520,21 +522,35 @@ class GameClient {
 
     bindEvents() {
         // Menu buttons
-        document.getElementById('create-lobby-btn').onclick = () => this.createLobby();
-        document.getElementById('refresh-lobbies-btn').onclick = () => this.refreshLobbies();
-        document.getElementById('how-to-play-btn').onclick = () => this.showScreen('rules-screen');
-        document.getElementById('back-to-menu-btn').onclick = () => this.showScreen('menu-screen');
-        document.getElementById('play-again-btn').onclick = () => this.backToMenu();
+        const createLobbyBtn = document.getElementById('create-lobby-btn');
+        const refreshBtn = document.getElementById('refresh-lobbies-btn');
+        const howToPlayBtn = document.getElementById('how-to-play-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+
+        if (createLobbyBtn) createLobbyBtn.onclick = () => this.createLobby();
+        if (refreshBtn) refreshBtn.onclick = () => this.refreshLobbies();
+        if (howToPlayBtn) howToPlayBtn.onclick = () => this.showScreen('rules-screen');
+        if (backToMenuBtn) backToMenuBtn.onclick = () => this.showScreen('menu-screen');
+        if (playAgainBtn) playAgainBtn.onclick = () => this.backToMenu();
 
         // Lobby buttons
-        document.getElementById('leave-lobby-btn').onclick = () => this.leaveLobby();
-        document.getElementById('start-game-btn').onclick = () => this.startGame();
-        document.getElementById('add-bot-btn').onclick = () => this.addBot();
+        const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const addBotBtn = document.getElementById('add-bot-btn');
+
+        if (leaveLobbyBtn) leaveLobbyBtn.onclick = () => this.leaveLobby();
+        if (startGameBtn) startGameBtn.onclick = () => this.startGame();
+        if (addBotBtn) addBotBtn.onclick = () => this.addBot();
 
         // Game buttons
-        document.getElementById('end-turn-btn').onclick = () => this.endTurn();
-        document.getElementById('cancel-target-btn').onclick = () => this.cancelTargeting();
-        document.getElementById('play-land-btn').onclick = () => this.playLand();
+        const endTurnBtn = document.getElementById('end-turn-btn');
+        const cancelTargetBtn = document.getElementById('cancel-target-btn');
+        const playLandBtn = document.getElementById('play-land-btn');
+
+        if (endTurnBtn) endTurnBtn.onclick = () => this.endTurn();
+        if (cancelTargetBtn) cancelTargetBtn.onclick = () => this.cancelTargeting();
+        if (playLandBtn) playLandBtn.onclick = () => this.playLand();
 
         // Cancel targeting when pressing Escape
         document.addEventListener('keydown', (e) => {
@@ -586,6 +602,7 @@ class GameClient {
     // ===== Lobby UI =====
     renderLobbyList() {
         const container = document.getElementById('lobby-list');
+        if (!container) return;
 
         if (this.lobbies.length === 0) {
             container.innerHTML = '<p class="no-lobbies">No open lobbies. Create one to start playing!</p>';
@@ -624,23 +641,24 @@ class GameClient {
     showLobbyWaiting() {
         this.showScreen('lobby-screen');
 
-        document.getElementById('lobby-id-display').textContent = this.currentLobby.id;
-        document.getElementById('lobby-host-name').textContent = this.currentLobby.hostName;
-
-        const guestEl = document.getElementById('lobby-guest-name');
-        const startBtn = document.getElementById('start-game-btn');
-        const statusEl = document.getElementById('lobby-status');
-
-        guestEl.textContent = 'Waiting for opponent...';
-        guestEl.classList.add('waiting');
-
-        startBtn.disabled = true;
-        startBtn.style.display = this.isHost ? 'block' : 'none';
-
-        statusEl.textContent = 'Waiting for an opponent to join...';
-
-        // Show/hide add bot button
+        const lobbyIdDisplay = document.getElementById('lobby-id-display');
+        const lobbyHostName = document.getElementById('lobby-host-name');
+        const lobbyGuestName = document.getElementById('lobby-guest-name');
+        const lobbyStatus = document.getElementById('lobby-status');
+        const startGameBtn = document.getElementById('start-game-btn');
         const addBotBtn = document.getElementById('add-bot-btn');
+
+        if (lobbyIdDisplay) lobbyIdDisplay.textContent = this.currentLobby.id;
+        if (lobbyHostName) lobbyHostName.textContent = this.currentLobby.hostName;
+        if (lobbyGuestName) {
+            lobbyGuestName.textContent = 'Waiting for opponent...';
+            lobbyGuestName.classList.add('waiting');
+        }
+        if (lobbyStatus) lobbyStatus.textContent = 'Waiting for an opponent to join...';
+        if (startGameBtn) {
+            startGameBtn.disabled = true;
+            startGameBtn.style.display = this.isHost ? 'block' : 'none';
+        }
         if (addBotBtn) {
             addBotBtn.style.display = this.isHost ? 'inline-block' : 'none';
         }
@@ -653,31 +671,29 @@ class GameClient {
     showLobbyReady() {
         this.showScreen('lobby-screen');
 
-        document.getElementById('lobby-id-display').textContent = this.currentLobby.id;
-        document.getElementById('lobby-host-name').textContent = this.currentLobby.hostName;
-
-        const guestEl = document.getElementById('lobby-guest-name');
-        const startBtn = document.getElementById('start-game-btn');
-        const statusEl = document.getElementById('lobby-status');
-
-        guestEl.textContent = this.currentLobby.guestName;
-        guestEl.classList.remove('waiting');
-
-        startBtn.style.display = this.isHost ? 'block' : 'none';
-
-        // Hide add bot button when opponent joined
+        const lobbyIdDisplay = document.getElementById('lobby-id-display');
+        const lobbyHostName = document.getElementById('lobby-host-name');
+        const lobbyGuestName = document.getElementById('lobby-guest-name');
+        const lobbyStatus = document.getElementById('lobby-status');
+        const startGameBtn = document.getElementById('start-game-btn');
         const addBotBtn = document.getElementById('add-bot-btn');
-        if (addBotBtn) {
-            addBotBtn.style.display = 'none';
-        }
 
-        if (this.isHost) {
-            startBtn.disabled = false;
-            statusEl.textContent = 'Opponent joined! Click Start Game to begin.';
-        } else {
-            startBtn.disabled = true;
-            statusEl.textContent = 'Waiting for host to start the game...';
+        if (lobbyIdDisplay) lobbyIdDisplay.textContent = this.currentLobby.id;
+        if (lobbyHostName) lobbyHostName.textContent = this.currentLobby.hostName;
+        if (lobbyGuestName) {
+            lobbyGuestName.textContent = this.currentLobby.guestName;
+            lobbyGuestName.classList.remove('waiting');
         }
+        if (startGameBtn) {
+            startGameBtn.style.display = this.isHost ? 'block' : 'none';
+            startGameBtn.disabled = !this.isHost;
+        }
+        if (addBotBtn) addBotBtn.style.display = 'none';
+
+        const statusText = this.isHost
+            ? 'Opponent joined! Click Start Game to begin.'
+            : 'Waiting for host to start the game...';
+        if (lobbyStatus) lobbyStatus.textContent = statusText;
     }
 
     // ===== Game Actions =====
@@ -1338,10 +1354,11 @@ class GameClient {
 
     // ===== UI Helpers =====
     showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(screen => {
+        document.querySelectorAll('#app .screen').forEach(screen => {
             screen.classList.remove('active');
         });
-        document.getElementById(screenId).classList.add('active');
+        const screen = document.getElementById(screenId);
+        if (screen) screen.classList.add('active');
     }
 
     showTargetOverlay(prompt) {
@@ -1367,19 +1384,23 @@ class GameClient {
     }
 
     showGameOver(winner, winnerName) {
-        const title = document.getElementById('gameover-title');
-        const message = document.getElementById('gameover-message');
+        let titleText, messageText;
 
         if (winner === 'draw') {
-            title.textContent = 'Draw!';
-            message.textContent = 'Both players were defeated simultaneously.';
+            titleText = 'Draw!';
+            messageText = 'Both players were defeated simultaneously.';
         } else if (winner === this.playerId) {
-            title.textContent = 'Victory!';
-            message.textContent = 'You have defeated your opponent!';
+            titleText = 'Victory!';
+            messageText = 'You have defeated your opponent!';
         } else {
-            title.textContent = 'Defeat';
-            message.textContent = `${winnerName || 'Your opponent'} has won the game.`;
+            titleText = 'Defeat';
+            messageText = `${winnerName || 'Your opponent'} has won the game.`;
         }
+
+        const titleEl = document.getElementById('gameover-title');
+        const messageEl = document.getElementById('gameover-message');
+        if (titleEl) titleEl.textContent = titleText;
+        if (messageEl) messageEl.textContent = messageText;
 
         this.showScreen('gameover-screen');
     }

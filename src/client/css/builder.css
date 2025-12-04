@@ -123,6 +123,23 @@
     overflow: hidden;
 }
 
+.deck-builder-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow: hidden;
+}
+
+.deck-builder-left .panel {
+    flex: 1;
+    min-height: 0;
+}
+
+.deck-builder-left #panel-saved {
+    flex: 0 0 auto;
+    max-height: 200px;
+}
+
 /* ===================== */
 /* PANELS */
 /* ===================== */
@@ -162,6 +179,11 @@
 .panel-header span {
     color: var(--text-secondary);
     font-size: 0.85rem;
+}
+
+.panel-header-buttons {
+    display: flex;
+    gap: 0.5rem;
 }
 
 .panel-content {
@@ -1104,16 +1126,6 @@
 }
 
 @media (max-width: 768px) {
-    .nav-bar {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
     .card-preview-large {
         width: 180px;
         height: 260px;
