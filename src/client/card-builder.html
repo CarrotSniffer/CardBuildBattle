@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a1628">
     <title>Card Builder - Strategic Card Game</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/builder.css">
@@ -33,6 +37,145 @@
                 <div class="panel-content">
                     <div id="traits-container" class="traits-container">
                         <!-- Trait categories will be rendered here by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Wizard Panel (Center-Left) -->
+            <div class="panel wizard-panel" id="panel-wizard">
+                <div class="panel-header">
+                    <h2>Card Wizard</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="toggleWizard()">
+                        <span id="wizard-toggle-text">Hide</span>
+                    </button>
+                </div>
+                <div id="wizard-content" class="wizard-content">
+                    <p class="wizard-intro">Build your perfect card step by step!</p>
+
+                    <!-- Step 1: Role -->
+                    <div class="wizard-step" data-step="1">
+                        <div class="wizard-step-header">
+                            <span class="step-number">1</span>
+                            <span class="step-title">What role should this card fill?</span>
+                        </div>
+                        <div class="wizard-options" id="wizard-role">
+                            <button class="wizard-option" data-value="tank" onclick="selectWizardOption('role', 'tank', this)">
+                                <span class="option-icon">��️</span>
+                                <span class="option-label">Tank</span>
+                                <span class="option-desc">High health, protects allies</span>
+                            </button>
+                            <button class="wizard-option" data-value="damage" onclick="selectWizardOption('role', 'damage', this)">
+                                <span class="option-icon">⚔️</span>
+                                <span class="option-label">Damage</span>
+                                <span class="option-desc">High attack, kills enemies</span>
+                            </button>
+                            <button class="wizard-option" data-value="support" onclick="selectWizardOption('role', 'support', this)">
+                                <span class="option-icon">✨</span>
+                                <span class="option-label">Support</span>
+                                <span class="option-desc">Buffs allies, utility effects</span>
+                            </button>
+                            <button class="wizard-option" data-value="assassin" onclick="selectWizardOption('role', 'assassin', this)">
+                                <span class="option-icon">🗡️</span>
+                                <span class="option-label">Assassin</span>
+                                <span class="option-desc">Fast, high burst damage</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Playstyle -->
+                    <div class="wizard-step" data-step="2">
+                        <div class="wizard-step-header">
+                            <span class="step-number">2</span>
+                            <span class="step-title">How should it play?</span>
+                        </div>
+                        <div class="wizard-options" id="wizard-playstyle">
+                            <button class="wizard-option" data-value="aggressive" onclick="selectWizardOption('playstyle', 'aggressive', this)">
+                                <span class="option-icon">🔥</span>
+                                <span class="option-label">Aggressive</span>
+                                <span class="option-desc">Attack immediately, high tempo</span>
+                            </button>
+                            <button class="wizard-option" data-value="defensive" onclick="selectWizardOption('playstyle', 'defensive', this)">
+                                <span class="option-icon">🏰</span>
+                                <span class="option-label">Defensive</span>
+                                <span class="option-desc">Survive, protect, outlast</span>
+                            </button>
+                            <button class="wizard-option" data-value="tricky" onclick="selectWizardOption('playstyle', 'tricky', this)">
+                                <span class="option-icon">🎭</span>
+                                <span class="option-label">Tricky</span>
+                                <span class="option-desc">Evasion, stealth, deception</span>
+                            </button>
+                            <button class="wizard-option" data-value="value" onclick="selectWizardOption('playstyle', 'value', this)">
+                                <span class="option-icon">💎</span>
+                                <span class="option-label">Value</span>
+                                <span class="option-desc">Efficient, sustain, grind</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Cost Preference -->
+                    <div class="wizard-step" data-step="3">
+                        <div class="wizard-step-header">
+                            <span class="step-number">3</span>
+                            <span class="step-title">Mana cost preference?</span>
+                        </div>
+                        <div class="wizard-options" id="wizard-cost">
+                            <button class="wizard-option" data-value="cheap" onclick="selectWizardOption('cost', 'cheap', this)">
+                                <span class="option-icon">💨</span>
+                                <span class="option-label">Cheap (0-2)</span>
+                                <span class="option-desc">Play early, swarm potential</span>
+                            </button>
+                            <button class="wizard-option" data-value="medium" onclick="selectWizardOption('cost', 'medium', this)">
+                                <span class="option-icon">⚖️</span>
+                                <span class="option-label">Medium (3-5)</span>
+                                <span class="option-desc">Balanced, flexible</span>
+                            </button>
+                            <button class="wizard-option" data-value="expensive" onclick="selectWizardOption('cost', 'expensive', this)">
+                                <span class="option-icon">👑</span>
+                                <span class="option-label">Expensive (6+)</span>
+                                <span class="option-desc">Powerful finisher</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Risk Tolerance -->
+                    <div class="wizard-step" data-step="4">
+                        <div class="wizard-step-header">
+                            <span class="step-number">4</span>
+                            <span class="step-title">Risk tolerance?</span>
+                        </div>
+                        <div class="wizard-options" id="wizard-risk">
+                            <button class="wizard-option" data-value="safe" onclick="selectWizardOption('risk', 'safe', this)">
+                                <span class="option-icon">🔒</span>
+                                <span class="option-label">Safe</span>
+                                <span class="option-desc">No downsides, reliable</span>
+                            </button>
+                            <button class="wizard-option" data-value="moderate" onclick="selectWizardOption('risk', 'moderate', this)">
+                                <span class="option-icon">🎲</span>
+                                <span class="option-label">Moderate</span>
+                                <span class="option-desc">Minor drawbacks for power</span>
+                            </button>
+                            <button class="wizard-option" data-value="risky" onclick="selectWizardOption('risk', 'risky', this)">
+                                <span class="option-icon">💀</span>
+                                <span class="option-label">High Risk</span>
+                                <span class="option-desc">Big drawbacks, big rewards</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <div class="wizard-actions">
+                        <button class="btn btn-primary btn-lg" onclick="generateFromWizard()" id="wizard-generate-btn" disabled>
+                            ✨ Generate Card
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetWizard()">
+                            Reset Choices
+                        </button>
+                    </div>
+
+                    <!-- Wizard Summary -->
+                    <div id="wizard-summary" class="wizard-summary hidden">
+                        <h4>Your Build:</h4>
+                        <div id="wizard-summary-content"></div>
                     </div>
                 </div>
             </div>

@@ -75,9 +75,10 @@ class Game {
             baseManaMax: 10,        // Natural mana cap without lands (grows each turn)
             maxMana: 17,            // Absolute maximum mana (10 base + 7 lands)
             cardsPerTurn: 1,        // Not used in new mechanic - player chooses how many to cycle
-            landCost: 1,            // Mana cost to play a land
+            landCost: 5,            // Mana cost to play a land
             landHealth: 5,          // Health for lands
-            landPoolSize: 7         // Number of lands in each player's pool
+            landPoolSize: 7,        // Number of lands in each player's pool
+            maxLandsOnField: 7      // Maximum lands on the battlefield
         };
 
         // Card selection state (for end of turn)
@@ -183,8 +184,8 @@ class Game {
             cost: this.getEffectiveManaCost(card),
             attack: card.attack,
             health: card.health,
-            abilities: card.traits || [],
-            traits: card.traits || []
+            abilities: [...(card.traits || [])], // Copy so modifications don't affect original
+            traits: card.traits || [] // Original traits for reference (e.g., undying restoration)
         }));
 
         // Shuffle deck (lands are now in separate pool, not in deck)
@@ -285,6 +286,10 @@ class Game {
 
         if (player.landPool <= 0) {
             return { success: false, message: 'No lands remaining in pool' };
+        }
+
+        if (player.lands.length >= this.config.maxLandsOnField) {
+            return { success: false, message: 'Battlefield is full (max 7 lands)' };
         }
 
         if (player.currentMana < this.config.landCost) {
@@ -527,28 +532,21 @@ class Game {
                 return { success: false, message: 'Target not found' };
             }
 
-            // PIERCING: Excess damage goes to hero
-            let piercingDamage = 0;
-            if (attacker.abilities && attacker.abilities.includes('piercing')) {
-                piercingDamage = Math.max(0, damage - target.currentHealth);
-            }
-
             // Track deaths for animation
             const deaths = [];
             const targetHealthBefore = target.currentHealth;
             const attackerHealthBefore = attacker.currentHealth;
 
-            // Deal damage to target (pass attacker for overpower check)
-            this.dealDamage(target, damage, opponent, playerId, attacker);
+            // Save target's attack for counter-attack BEFORE damage is dealt
+            // (because target may die and be removed from field)
+            const targetAttackForCounter = target.currentAttack;
+            const targetAbilities = target.abilities ? [...target.abilities] : [];
 
-            // DEATHTOUCH: If attacker has deathtouch and dealt any damage, destroy target
-            if (attacker.abilities && attacker.abilities.includes('deathtouch') && damage > 0) {
-                const targetStillExists = opponentPlayer.field.find(u => u.instanceId === targetInfo.instanceId);
-                if (targetStillExists && targetStillExists.currentHealth > 0) {
-                    this.destroyUnit(opponent, targetInfo.instanceId);
-                    this.addEvent('deathtouch_kill', { attackerName: attacker.name, targetName: target.name });
-                }
-            }
+            // Deal damage to target (pass attacker for overpower check)
+            // Returns actual damage dealt (after modifiers like armor, divine shield, etc.)
+            const actualDamageDealt = this.dealDamage(target, damage, opponent, playerId, attacker);
+
+            // NOTE: Deathtouch destruction happens AFTER counter-attack so both units can strike
 
             // Check if target died
             const targetDied = !opponentPlayer.field.find(u => u.instanceId === targetInfo.instanceId);
@@ -571,21 +569,27 @@ class Game {
                 }
             }
 
-            // Apply piercing
-            if (piercingDamage > 0) {
-                opponentPlayer.health -= piercingDamage;
-                this.addEvent('piercing_damage', { damage: piercingDamage });
+            // PIERCING: Excess damage beyond what killed the target goes to hero
+            // Only triggers if damage was actually dealt (not blocked by divine shield)
+            if (attacker.abilities && attacker.abilities.includes('piercing') && actualDamageDealt > 0) {
+                const piercingDamage = Math.max(0, actualDamageDealt - targetHealthBefore);
+                if (piercingDamage > 0) {
+                    opponentPlayer.health -= piercingDamage;
+                    this.addEvent('piercing_damage', { damage: piercingDamage });
+                }
             }
 
-            // LIFESTEAL
-            if (attacker.abilities && attacker.abilities.includes('lifesteal')) {
-                const actualDamage = Math.min(damage, targetHealthBefore);
-                player.health = Math.min(this.config.startingHealth, player.health + actualDamage);
-                this.addEvent('lifesteal', { playerId, amount: actualDamage });
+            // LIFESTEAL: Heal for actual damage dealt (not blocked damage)
+            if (attacker.abilities && attacker.abilities.includes('lifesteal') && actualDamageDealt > 0) {
+                // Cap lifesteal at target's health before damage (can't heal for overkill)
+                const lifestealAmount = Math.min(actualDamageDealt, targetHealthBefore);
+                player.health = Math.min(this.config.startingHealth, player.health + lifestealAmount);
+                this.addEvent('lifesteal', { playerId, amount: lifestealAmount });
             }
 
             // THORNS: Target deals 1 damage back to attacker when attacked (before counter-attack)
-            if (target.abilities && target.abilities.includes('thorns')) {
+            // Uses saved abilities for consistency (triggers even if target died)
+            if (targetAbilities.includes('thorns')) {
                 const attackerCheck = player.field.find(u => u.instanceId === attackerInstanceId);
                 if (attackerCheck) {
                     this.dealDamage(attackerCheck, 1, playerId, opponent);
@@ -593,46 +597,81 @@ class Game {
                 }
             }
 
-            // Counter-attack (unless RANGED)
+            // Counter-attack (unless RANGED) - happens simultaneously, so use saved attack value
             let counterDamage = 0;
+            let actualCounterDamage = 0;
             if (!(attacker.abilities && attacker.abilities.includes('ranged'))) {
-                const targetStillAlive = opponentPlayer.field.find(u => u.instanceId === targetInfo.instanceId);
-                if (targetStillAlive) {
-                    counterDamage = targetStillAlive.currentAttack;
+                // Use saved attack value from before damage was dealt (simultaneous combat)
+                counterDamage = targetAttackForCounter;
 
-                    // RETALIATE: Deals double counter-attack damage
-                    if (targetStillAlive.abilities && targetStillAlive.abilities.includes('retaliate')) {
-                        counterDamage *= 2;
+                // RETALIATE: Deals double counter-attack damage
+                if (targetAbilities.includes('retaliate')) {
+                    counterDamage *= 2;
+                }
+
+                if (counterDamage > 0) {
+                    // Capture actual damage dealt (may be 0 if divine shield blocked)
+                    actualCounterDamage = this.dealDamage(attacker, counterDamage, playerId, opponent);
+                }
+
+                // DEATHTOUCH: If target has deathtouch and ACTUALLY dealt counter damage, destroy attacker
+                // Only triggers if damage was actually dealt (not blocked by divine shield)
+                if (targetAbilities.includes('deathtouch') && actualCounterDamage > 0) {
+                    const attackerStillExists = player.field.find(u => u.instanceId === attackerInstanceId);
+                    if (attackerStillExists && attackerStillExists.currentHealth > 0) {
+                        this.destroyUnit(playerId, attackerInstanceId);
+                        this.addEvent('deathtouch_kill', { attackerName: target.name, targetName: attacker.name });
                     }
+                }
 
-                    this.dealDamage(attacker, counterDamage, playerId, opponent);
+                // VAMPIRIC for defender: If target kills attacker (and target survived)
+                const attackerDied = !player.field.find(u => u.instanceId === attackerInstanceId);
+                const targetStillAlive = opponentPlayer.field.find(u => u.instanceId === targetInfo.instanceId);
+                if (attackerDied) {
+                    deaths.push({
+                        instanceId: attackerInstanceId,
+                        name: attacker.name,
+                        ownerId: playerId
+                    });
 
-                    // DEATHTOUCH: If target has deathtouch and dealt any counter damage, destroy attacker
-                    if (targetStillAlive.abilities && targetStillAlive.abilities.includes('deathtouch') && counterDamage > 0) {
-                        const attackerStillExists = player.field.find(u => u.instanceId === attackerInstanceId);
-                        if (attackerStillExists && attackerStillExists.currentHealth > 0) {
-                            this.destroyUnit(playerId, attackerInstanceId);
-                            this.addEvent('deathtouch_kill', { attackerName: target.name, targetName: attacker.name });
+                    // Defender vampiric (only if defender survived)
+                    if (targetStillAlive && targetAbilities.includes('vampiric')) {
+                        if (!targetAbilities.includes('cursed')) {
+                            targetStillAlive.currentAttack += 1;
+                            targetStillAlive.currentHealth += 1;
+                            targetStillAlive.health += 1;
+                            this.addEvent('vampiric', { unitName: target.name });
                         }
                     }
+                }
+            }
 
-                    // VAMPIRIC for defender: If target kills attacker
-                    const attackerDied = !player.field.find(u => u.instanceId === attackerInstanceId);
-                    if (attackerDied) {
+            // DEATHTOUCH: Attacker destroys any unit it damages (after counter-attack so both can strike)
+            // Only triggers if damage was actually dealt (not blocked by divine shield)
+            if (attacker.abilities && attacker.abilities.includes('deathtouch') && actualDamageDealt > 0) {
+                const targetStillExists = opponentPlayer.field.find(u => u.instanceId === targetInfo.instanceId);
+                if (targetStillExists && targetStillExists.currentHealth > 0) {
+                    this.destroyUnit(opponent, targetInfo.instanceId);
+                    this.addEvent('deathtouch_kill', { attackerName: attacker.name, targetName: target.name });
+
+                    // Add to deaths array if not already there
+                    const targetInDeaths = deaths.find(d => d.instanceId === targetInfo.instanceId);
+                    if (!targetInDeaths) {
                         deaths.push({
-                            instanceId: attackerInstanceId,
-                            name: attacker.name,
-                            ownerId: playerId
+                            instanceId: targetInfo.instanceId,
+                            name: target.name,
+                            ownerId: opponent
                         });
+                    }
 
-                        // Defender vampiric
-                        if (targetStillAlive.abilities && targetStillAlive.abilities.includes('vampiric')) {
-                            if (!(targetStillAlive.abilities && targetStillAlive.abilities.includes('cursed'))) {
-                                targetStillAlive.currentAttack += 1;
-                                targetStillAlive.currentHealth += 1;
-                                targetStillAlive.health += 1;
-                                this.addEvent('vampiric', { unitName: target.name });
-                            }
+                    // VAMPIRIC: Attacker gains +1/+1 for kill via deathtouch
+                    const attackerStillAlive = player.field.find(u => u.instanceId === attackerInstanceId);
+                    if (attackerStillAlive && attacker.abilities && attacker.abilities.includes('vampiric')) {
+                        if (!(attackerStillAlive.abilities && attackerStillAlive.abilities.includes('cursed'))) {
+                            attackerStillAlive.currentAttack += 1;
+                            attackerStillAlive.currentHealth += 1;
+                            attackerStillAlive.health += 1;
+                            this.addEvent('vampiric', { unitName: attacker.name });
                         }
                     }
                 }
@@ -677,9 +716,28 @@ class Game {
                 return { success: false, message: 'Land not found' };
             }
 
+            const landHealthBefore = target.currentHealth;
             target.currentHealth -= damage;
-            if (target.currentHealth <= 0) {
+            const landDestroyed = target.currentHealth <= 0;
+
+            if (landDestroyed) {
                 this.destroyLand(opponent, targetInfo.instanceId);
+            }
+
+            // PIERCING: Excess damage beyond what killed the land goes to hero
+            if (attacker.abilities && attacker.abilities.includes('piercing') && landDestroyed) {
+                const piercingDamage = Math.max(0, damage - landHealthBefore);
+                if (piercingDamage > 0) {
+                    opponentPlayer.health -= piercingDamage;
+                    this.addEvent('piercing_damage', { damage: piercingDamage });
+                }
+            }
+
+            // LIFESTEAL: Heal for damage dealt to land
+            if (attacker.abilities && attacker.abilities.includes('lifesteal')) {
+                const lifestealAmount = Math.min(damage, landHealthBefore);
+                player.health = Math.min(this.config.startingHealth, player.health + lifestealAmount);
+                this.addEvent('lifesteal', { playerId, amount: lifestealAmount });
             }
 
             // Break stealth when attacking
@@ -764,7 +822,7 @@ class Game {
             const idx = unit.abilities.indexOf('divine_shield');
             unit.abilities.splice(idx, 1);
             this.addEvent('divine_shield_broken', { unitName: unit.name });
-            return;
+            return 0; // No damage was dealt
         }
 
         // FRAIL: Dies to ANY damage
@@ -777,6 +835,8 @@ class Game {
         if (unit.currentHealth <= 0) {
             this.destroyUnit(ownerId, unit.instanceId);
         }
+
+        return amount; // Return actual damage dealt (after modifiers)
     }
 
     destroyUnit(ownerId, instanceId) {
@@ -795,6 +855,10 @@ class Game {
                 unit.hasAttackedThisTurn = false;
                 unit.attacksThisTurn = 0;
                 unit.turnsOnField = 0;
+                // Restore abilities from original traits (e.g., divine_shield that was popped)
+                unit.abilities = [...(unit.traits || [])];
+                // Restore stealth if originally had it
+                unit.hasStealthActive = unit.traits && unit.traits.includes('stealth');
                 player.hand.push(unit);
                 this.addEvent('undying', { unitName: unit.name });
                 return; // Don't continue to graveyard or other death effects
@@ -828,6 +892,8 @@ class Game {
         const idx = player.lands.findIndex(l => l.instanceId === instanceId);
         if (idx !== -1) {
             player.lands.splice(idx, 1);
+            // Return the land to the pool so it can be played again
+            player.landPool = Math.min(player.landPool + 1, this.config.landPoolSize);
             this.addEvent('land_destroyed', { ownerId });
         }
     }
@@ -842,15 +908,77 @@ class Game {
             return { success: false, message: 'Please select cards to shuffle back first' };
         }
 
-        // RECKLESS: Check if any reckless units haven't attacked yet
+        // RECKLESS: Auto-attack random valid targets for any reckless units that can still attack
+        // Keep looping until no more reckless attacks can be made (handles frenzy multiple attacks)
         const player = this.players[playerId];
-        const recklessUnits = player.field.filter(unit =>
-            unit.abilities && unit.abilities.includes('reckless') &&
-            unit.canAttack && !unit.hasAttackedThisTurn
-        );
-        if (recklessUnits.length > 0) {
-            const unitNames = recklessUnits.map(u => u.name).join(', ');
-            return { success: false, message: `Reckless units must attack: ${unitNames}` };
+        const opponentState = this.players[this.getOpponent(playerId)];
+
+        let recklessAttackMade = true;
+        while (recklessAttackMade) {
+            recklessAttackMade = false;
+
+            // Find all reckless units that can still attack
+            const recklessUnits = player.field.filter(unit => {
+                if (!(unit.abilities && unit.abilities.includes('reckless'))) return false;
+                if (!unit.canAttack) return false;
+                const maxAttacks = (unit.abilities && unit.abilities.includes('frenzy')) ? 2 : 1;
+                return unit.attacksThisTurn < maxAttacks;
+            });
+
+            for (const recklessUnit of recklessUnits) {
+                // Re-check if unit can still attack (might have died or changed)
+                const unitStillExists = player.field.find(u => u.instanceId === recklessUnit.instanceId);
+                if (!unitStillExists || !unitStillExists.canAttack) continue;
+
+                const maxAttacks = (recklessUnit.abilities && recklessUnit.abilities.includes('frenzy')) ? 2 : 1;
+                if (recklessUnit.attacksThisTurn >= maxAttacks) continue;
+
+                // Find valid targets for this reckless unit
+                const validTargets = [];
+                const isPacifist = recklessUnit.abilities && recklessUnit.abilities.includes('pacifist');
+                const isCowardly = recklessUnit.abilities && recklessUnit.abilities.includes('cowardly');
+                const isElusive = recklessUnit.abilities && recklessUnit.abilities.includes('elusive');
+
+                // Check for taunt units
+                const tauntUnits = opponentState.field.filter(u =>
+                    u.abilities && u.abilities.includes('taunt') && !u.hasStealthActive &&
+                    (!isElusive || u.currentAttack >= 3)
+                );
+
+                if (tauntUnits.length > 0) {
+                    // Must attack taunt units - filter by cowardly constraint
+                    tauntUnits.forEach(u => {
+                        if (!isCowardly || u.currentAttack <= recklessUnit.currentAttack) {
+                            validTargets.push({ type: 'unit', instanceId: u.instanceId });
+                        }
+                    });
+                } else {
+                    // Can attack any non-stealthed unit
+                    opponentState.field.forEach(u => {
+                        if (!u.hasStealthActive) {
+                            if (!isCowardly || u.currentAttack <= recklessUnit.currentAttack) {
+                                validTargets.push({ type: 'unit', instanceId: u.instanceId });
+                            }
+                        }
+                    });
+
+                    // Can attack hero and lands (unless pacifist)
+                    if (!isPacifist) {
+                        validTargets.push({ type: 'hero' });
+                        opponentState.lands.forEach(l => {
+                            validTargets.push({ type: 'land', instanceId: l.instanceId });
+                        });
+                    }
+                }
+
+                // Pick a random valid target and attack
+                if (validTargets.length > 0) {
+                    const randomTarget = validTargets[Math.floor(Math.random() * validTargets.length)];
+                    this.attack(playerId, recklessUnit.instanceId, randomTarget);
+                    this.addEvent('reckless_attack', { unitName: recklessUnit.name, targetType: randomTarget.type });
+                    recklessAttackMade = true; // Continue loop to check for more attacks
+                }
+            }
         }
 
         // Process end of turn effects

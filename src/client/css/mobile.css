@@ -4,6 +4,116 @@
 /* ===================== */
 
 /* ===================== */
+/* VIEWPORT-BASED SCALING OVERRIDES */
+/* ===================== */
+
+/* Large screens (1400px+) - slightly larger elements */
+@media (min-width: 1400px) {
+    :root {
+        --card-width: clamp(90px, 7vw, 110px);
+        --card-height: clamp(126px, 9.8vw, 154px);
+        --field-card-width: clamp(75px, 5.5vw, 95px);
+        --field-card-height: clamp(93px, 6.8vw, 118px);
+        --land-width: clamp(40px, 3vw, 50px);
+        --land-height: clamp(50px, 3.6vw, 62px);
+        --crystal-width: clamp(14px, 1.1vw, 18px);
+        --crystal-height: clamp(18px, 1.4vw, 22px);
+        --hero-size: clamp(65px, 5vw, 80px);
+        --hero-orb-size: clamp(28px, 2.2vw, 36px);
+    }
+}
+
+/* Medium screens (1024px - 1399px) - default sizing */
+@media (min-width: 1024px) and (max-width: 1399px) {
+    :root {
+        --card-width: clamp(70px, 7vw, 95px);
+        --card-height: clamp(98px, 9.8vw, 133px);
+        --field-card-width: clamp(60px, 6vw, 80px);
+        --field-card-height: clamp(75px, 7.5vw, 100px);
+    }
+}
+
+/* Tablet screens (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    :root {
+        --card-width: clamp(60px, 9vw, 85px);
+        --card-height: clamp(84px, 12.6vw, 119px);
+        --field-card-width: clamp(55px, 7.5vw, 75px);
+        --field-card-height: clamp(68px, 9.3vw, 93px);
+        --land-width: clamp(30px, 4vw, 42px);
+        --land-height: clamp(36px, 4.8vw, 52px);
+        --crystal-width: clamp(11px, 1.4vw, 15px);
+        --crystal-height: clamp(14px, 1.8vw, 19px);
+        --hero-size: clamp(50px, 6.5vw, 68px);
+        --hero-orb-size: clamp(22px, 2.8vw, 30px);
+    }
+}
+
+/* Mobile screens (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+    :root {
+        --card-width: clamp(52px, 12vw, 70px);
+        --card-height: clamp(72px, 16.8vw, 98px);
+        --field-card-width: clamp(48px, 10vw, 62px);
+        --field-card-height: clamp(60px, 12.5vw, 77px);
+        --land-width: clamp(24px, 5vw, 34px);
+        --land-height: clamp(30px, 6.2vw, 42px);
+        --crystal-width: clamp(9px, 1.8vw, 12px);
+        --crystal-height: clamp(11px, 2.3vw, 15px);
+        --hero-size: clamp(42px, 9vw, 55px);
+        --hero-orb-size: clamp(18px, 4vw, 24px);
+    }
+}
+
+/* Small mobile screens (< 480px) */
+@media (max-width: 479px) {
+    :root {
+        --card-width: clamp(46px, 14vw, 58px);
+        --card-height: clamp(64px, 19.6vw, 81px);
+        --field-card-width: clamp(42px, 12vw, 52px);
+        --field-card-height: clamp(52px, 15vw, 65px);
+        --land-width: clamp(22px, 6vw, 28px);
+        --land-height: clamp(26px, 7.2vw, 34px);
+        --crystal-width: clamp(8px, 2vw, 10px);
+        --crystal-height: clamp(10px, 2.5vw, 13px);
+        --hero-size: clamp(36px, 10vw, 46px);
+        --hero-orb-size: clamp(16px, 4.5vw, 20px);
+    }
+}
+
+/* Extra small screens (< 360px) */
+@media (max-width: 359px) {
+    :root {
+        --card-width: clamp(42px, 15vw, 50px);
+        --card-height: clamp(58px, 21vw, 70px);
+        --field-card-width: clamp(38px, 13vw, 46px);
+        --field-card-height: clamp(48px, 16vw, 58px);
+        --land-width: clamp(20px, 6.5vw, 24px);
+        --land-height: clamp(24px, 8vw, 30px);
+        --crystal-width: clamp(7px, 2.2vw, 9px);
+        --crystal-height: clamp(9px, 2.8vw, 11px);
+        --hero-size: clamp(32px, 11vw, 40px);
+        --hero-orb-size: clamp(14px, 5vw, 18px);
+    }
+}
+
+/* Landscape phone orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+    :root {
+        --card-width: clamp(40px, 8vh, 55px);
+        --card-height: clamp(56px, 11.2vh, 77px);
+        --field-card-width: clamp(38px, 7.5vh, 50px);
+        --field-card-height: clamp(48px, 9.5vh, 62px);
+        --land-width: clamp(18px, 4vh, 26px);
+        --land-height: clamp(22px, 5vh, 32px);
+        --crystal-width: clamp(6px, 1.5vh, 9px);
+        --crystal-height: clamp(8px, 2vh, 11px);
+        --hero-size: clamp(30px, 7vh, 42px);
+        --hero-orb-size: clamp(14px, 3.5vh, 18px);
+    }
+}
+
+/* ===================== */
 /* BASE RESPONSIVE FIXES */
 /* ===================== */
 
@@ -15,6 +125,7 @@ html {
 body {
     overflow-x: hidden;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 /* ===================== */
@@ -32,15 +143,66 @@ body {
         padding: 0.5rem;
     }
 
-    /* Slightly smaller cards */
-    .card {
-        width: 90px;
-        height: 125px;
+    /* Game board adjustments */
+    .game-board {
+        padding: 0.5rem;
     }
 
-    .field-unit {
-        width: 80px;
-        height: 100px;
+    .hero-frame {
+        gap: 0.5rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .hero-portrait {
+        width: 55px;
+        height: 55px;
+    }
+
+    .hero-health-orb {
+        width: 26px;
+        height: 26px;
+        font-size: 0.85rem;
+    }
+
+    .hero-name {
+        font-size: 0.8rem;
+    }
+
+    .resource {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    /* Arena center */
+    .arena-center {
+        padding: 0.5rem;
+        gap: 0.75rem;
+    }
+
+    .turn-gem {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .end-turn-button {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.85rem;
+    }
+
+    /* Lands row */
+    .lands-row {
+        padding: 0.3rem 0.5rem;
+    }
+
+    .land-button {
+        padding: 0.3rem 0.6rem;
+    }
+
+    /* Cards use CSS variables for responsive sizing */
+
+    /* Hand tray */
+    .hand-tray {
+        padding: 0.5rem;
     }
 }
 
@@ -305,166 +467,244 @@ body {
     }
 
     /* =============== */
-    /* GAME SCREEN */
+    /* GAME SCREEN - APP-LIKE VIEWPORT */
+    /* Only apply when game screen is active */
     /* =============== */
-    #game-screen {
+    #game-screen.active {
         padding: 0;
+        padding-top: env(safe-area-inset-top, 0);
+        padding-bottom: env(safe-area-inset-bottom, 0);
         height: 100vh;
-        min-height: 100vh;
+        height: 100svh; /* Small viewport height - accounts for browser UI */
+        height: 100dvh;
+        min-height: -webkit-fill-available;
+        max-height: 100svh;
+        max-height: 100dvh;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
     }
 
-    /* Player bars */
-    .player-bar {
-        padding: 0.4rem 0.75rem;
-        gap: 0.75rem;
+    /* Game board - fills available space and scales content */
+    #game-screen.active .game-board {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: clamp(2px, 0.5vw, 4px);
+        gap: 0;
+        max-height: 100%;
+        min-height: 0;
+        overflow: hidden;
+        box-sizing: border-box;
     }
 
-    .player-portrait {
-        width: 50px;
-        height: 50px;
+    #game-screen.active .game-side {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        min-height: 0;
+        max-height: 50%;
     }
 
-    .portrait-health {
+    /* Opponent side - stack from top */
+    #game-screen.active .opponent-side {
+        justify-content: flex-start;
+    }
+
+    /* Player side - stack from bottom */
+    #game-screen.active .player-side {
+        justify-content: flex-end;
+    }
+
+    /* Hero frames */
+    .hero-frame {
+        padding: clamp(2px, 0.5vh, 6px) clamp(4px, 1vw, 8px);
+        gap: clamp(2px, 0.5vh, 6px);
+        border-radius: 6px;
+        flex-shrink: 0;
+    }
+
+    /* Hero uses CSS variables for sizing */
+
+    .hero-portrait-inner {
         font-size: 1.2rem;
     }
 
-    .portrait-name {
-        font-size: 0.5rem;
-    }
-
-    .player-stats {
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    .stat {
+    .hero-health-orb {
         font-size: 0.75rem;
-        padding: 0.2rem 0.4rem;
     }
 
-    .stat-icon {
-        font-size: 1rem;
+    .hero-name {
+        font-size: 0.7rem;
     }
 
-    /* Battlefield zones */
-    .battlefield-zone {
-        min-height: 80px;
-        padding: 0.4rem;
+    .hero-resources {
+        gap: 0.35rem;
+    }
+
+    .resource {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.35rem;
+        gap: 0.2rem;
+    }
+
+    .resource-icon {
+        font-size: 0.7rem;
+    }
+
+    /* Lands row - viewport scaled */
+    .lands-row {
+        padding: clamp(2px, 0.3vh, 4px) clamp(4px, 1vw, 8px);
+        min-height: clamp(24px, 4vh, 36px);
+        flex-shrink: 0;
+    }
+
+    .lands-container {
+        gap: clamp(2px, 0.5vw, 4px);
+    }
+
+    /* Lands use CSS variables for sizing */
+    .land-card {
+        font-size: clamp(0.4rem, 1.2vw, 0.55rem);
+        width: clamp(20px, 5vw, 32px);
+        height: clamp(24px, 6vw, 40px);
+    }
+
+    .land-icon {
+        font-size: clamp(0.6rem, 2vw, 0.8rem);
+    }
+
+    .land-health {
+        font-size: clamp(0.4rem, 1.2vw, 0.5rem);
+    }
+
+    .land-button {
+        padding: clamp(2px, 0.3vh, 4px) clamp(4px, 1vw, 8px);
+        font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+    }
+
+    .land-btn-icon {
+        font-size: clamp(0.6rem, 2vw, 0.75rem);
+    }
+
+    /* Battlefield - flex to fill available space */
+    .battlefield {
+        flex: 1;
+        padding: clamp(2px, 0.3vh, 4px);
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .battlefield-inner {
+        max-height: 100%;
     }
 
     .units-container {
-        gap: 0.4rem;
+        gap: clamp(2px, 0.5vw, 6px);
     }
 
-    /* Cards on field */
+    /* Field cards - viewport scaled */
     .field-unit {
-        width: 55px;
-        height: 72px;
+        width: clamp(36px, 10vw, 55px);
+        height: clamp(48px, 13vw, 72px);
     }
 
     .field-unit .card-cost {
-        width: 18px;
-        height: 18px;
-        font-size: 0.6rem;
+        width: clamp(14px, 4vw, 18px);
+        height: clamp(14px, 4vw, 18px);
+        font-size: clamp(0.45rem, 1.5vw, 0.6rem);
     }
 
     .field-unit .card-name {
-        font-size: 0.45rem;
+        font-size: clamp(0.35rem, 1.2vw, 0.45rem);
     }
 
     .field-unit .card-attack,
     .field-unit .card-health {
-        font-size: 0.6rem;
-        padding: 0.1rem 0.25rem;
+        font-size: clamp(0.45rem, 1.5vw, 0.6rem);
+        padding: 0.1rem 0.2rem;
     }
 
     .field-unit .abilities {
         display: none;
     }
 
-    /* Lands zone */
-    .lands-zone {
-        min-height: 40px;
-        padding: 0.25rem 0.5rem;
-        gap: 0.75rem;
+    /* Arena center - minimal height */
+    .arena-center {
+        padding: clamp(2px, 0.3vh, 4px);
+        gap: clamp(4px, 1vw, 8px);
+        min-height: auto;
+        flex-shrink: 0;
     }
 
-    .land-card {
-        width: 32px;
-        height: 32px;
-        font-size: 0.6rem;
+    .arena-divider {
+        display: none;
     }
 
-    .land-icon {
-        font-size: 0.9rem;
+    .turn-display {
+        gap: clamp(2px, 0.5vw, 4px);
     }
 
-    .land-health {
-        font-size: 0.55rem;
+    .turn-gem {
+        padding: clamp(3px, 0.5vh, 6px) clamp(8px, 2vw, 12px);
+        font-size: clamp(0.6rem, 2vw, 0.75rem);
     }
 
-    .btn-land-small {
-        padding: 0.35rem 0.6rem;
-        font-size: 0.7rem;
-        min-height: 32px;
+    .turn-counter {
+        font-size: clamp(0.5rem, 1.5vw, 0.6rem);
     }
 
-    /* Center divider */
-    .game-center-divider {
-        padding: 0.4rem 0.75rem;
-        gap: 1rem;
+    .end-turn-button {
+        padding: clamp(4px, 0.6vh, 8px) clamp(10px, 2.5vw, 16px);
+        font-size: clamp(0.65rem, 2vw, 0.8rem);
+        min-width: clamp(70px, 20vw, 90px);
     }
 
-    .turn-badge {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.85rem;
+    /* Hand tray - fixed height at bottom, never cutoff */
+    .hand-tray {
+        padding: clamp(2px, 0.3vh, 4px);
+        padding-bottom: calc(clamp(2px, 0.3vh, 4px) + env(safe-area-inset-bottom, 0));
+        flex-shrink: 0;
+        max-height: clamp(60px, 12vh, 90px);
     }
 
-    .turn-number {
-        font-size: 0.7rem;
-    }
-
-    .btn-end-turn {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        min-width: 100px;
-    }
-
-    /* Hand zone */
-    .hand-zone {
-        padding: 0.4rem 0.5rem;
-        min-height: 100px;
+    .hand-tray-inner {
+        padding: clamp(2px, 0.3vh, 4px);
+        max-height: 100%;
     }
 
     .hand-container {
-        gap: 0.35rem;
+        gap: clamp(3px, 0.8vw, 6px);
         overflow-x: auto;
         flex-wrap: nowrap;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 0.25rem;
+        padding-bottom: 2px;
         justify-content: flex-start;
+        max-height: 100%;
     }
 
-    /* Cards in hand */
+    /* Hand cards - viewport scaled to fit */
     .hand-container .card {
-        width: 60px;
-        height: 82px;
         flex-shrink: 0;
-        padding: 0.2rem;
+        padding: 2px;
+        width: clamp(40px, 11vw, 60px);
+        height: clamp(55px, 10vh, 80px);
+        max-height: calc(clamp(60px, 12vh, 90px) - 8px);
     }
 
     .hand-container .card-cost {
-        width: 20px;
-        height: 20px;
-        font-size: 0.7rem;
-        top: -6px;
-        left: -6px;
+        font-size: clamp(0.5rem, 1.8vw, 0.7rem);
+        width: clamp(14px, 4vw, 20px);
+        height: clamp(14px, 4vw, 20px);
     }
 
     .hand-container .card-name {
-        font-size: 0.45rem;
-        margin-top: 0.4rem;
+        font-size: clamp(0.35rem, 1.2vw, 0.45rem);
+        margin-top: 2px;
     }
 
     .hand-container .abilities {
@@ -472,12 +712,12 @@ body {
     }
 
     .hand-container .card-stats {
-        padding: 0.2rem;
+        padding: 2px;
     }
 
     .hand-container .card-attack,
     .hand-container .card-health {
-        font-size: 0.65rem;
+        font-size: clamp(0.5rem, 1.8vw, 0.65rem);
     }
 
     /* =============== */
@@ -606,39 +846,36 @@ body {
         font-size: 0.8rem;
     }
 
-    /* Smaller game elements */
-    .player-portrait {
-        width: 44px;
-        height: 44px;
+    /* Game elements use CSS variables for sizing */
+    .hero-health-orb {
+        font-size: 0.7rem;
     }
 
-    .portrait-health {
-        font-size: 1.1rem;
+    .hero-portrait-inner {
+        font-size: 1rem;
     }
 
-    .field-unit {
-        width: 48px;
-        height: 65px;
+    .hero-name {
+        font-size: 0.65rem;
     }
 
-    .hand-container .card {
-        width: 52px;
-        height: 72px;
+    .resource {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.3rem;
     }
 
-    .land-card {
-        width: 28px;
-        height: 28px;
+    .turn-gem {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
     }
 
-    /* Tighter spacing */
-    .battlefield-zone {
-        min-height: 70px;
+    .end-turn-button {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+        min-width: 80px;
     }
 
-    .hand-zone {
-        min-height: 85px;
-    }
+    /* Cards and lands use CSS variables for sizing */
 }
 
 /* ===================== */
@@ -729,118 +966,138 @@ body {
         margin: 0.2rem 0;
     }
 
-    /* Game elements - most compact */
-    .player-bar {
-        padding: 0.3rem 0.5rem;
-        gap: 0.5rem;
+    /* Game screen - small phones viewport scaling */
+    #game-screen.active {
+        padding-left: env(safe-area-inset-left, 2px);
+        padding-right: env(safe-area-inset-right, 2px);
     }
 
-    .player-portrait {
-        width: 40px;
-        height: 40px;
+    /* Game elements - viewport scaled for small phones */
+    .hero-frame {
+        padding: clamp(2px, 0.4vh, 4px) clamp(3px, 0.8vw, 6px);
+        gap: clamp(2px, 0.4vh, 4px);
     }
 
-    .portrait-health {
-        font-size: 1rem;
+    .hero-portrait {
+        width: clamp(28px, 8vw, 40px);
+        height: clamp(28px, 8vw, 40px);
     }
 
-    .stat {
-        font-size: 0.65rem;
+    .hero-portrait-inner {
+        font-size: clamp(0.7rem, 2.5vw, 0.9rem);
     }
 
-    .stat-icon {
-        font-size: 0.9rem;
+    .hero-health-orb {
+        font-size: clamp(0.5rem, 1.8vw, 0.65rem);
+        width: clamp(16px, 5vw, 22px);
+        height: clamp(16px, 5vw, 22px);
     }
 
-    .battlefield-zone {
-        min-height: 60px;
-        padding: 0.3rem;
+    .hero-name {
+        font-size: clamp(0.45rem, 1.6vw, 0.6rem);
+    }
+
+    .resource {
+        font-size: clamp(0.45rem, 1.5vw, 0.55rem);
+        padding: 1px 3px;
+    }
+
+    .resource-icon {
+        font-size: clamp(0.5rem, 1.6vw, 0.6rem);
+    }
+
+    .battlefield {
+        padding: 2px;
     }
 
     .field-unit {
-        width: 42px;
-        height: 58px;
+        width: clamp(32px, 9vw, 48px);
+        height: clamp(42px, 11vw, 62px);
     }
 
     .field-unit .card-name {
-        font-size: 0.4rem;
+        font-size: clamp(0.3rem, 1vw, 0.4rem);
     }
 
     .field-unit .card-attack,
     .field-unit .card-health {
-        font-size: 0.55rem;
+        font-size: clamp(0.4rem, 1.3vw, 0.55rem);
     }
 
-    .lands-zone {
-        min-height: 32px;
-        padding: 0.2rem 0.4rem;
+    .lands-row {
+        padding: 2px 4px;
+        min-height: clamp(20px, 3.5vh, 30px);
     }
 
     .land-card {
-        width: 24px;
-        height: 24px;
+        width: clamp(18px, 4.5vw, 26px);
+        height: clamp(22px, 5.5vw, 32px);
     }
 
     .land-icon {
-        font-size: 0.75rem;
+        font-size: clamp(0.5rem, 1.6vw, 0.7rem);
     }
 
-    .btn-land-small {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.65rem;
+    .land-button {
+        padding: 2px 4px;
+        font-size: clamp(0.4rem, 1.3vw, 0.55rem);
     }
 
-    .game-center-divider {
-        padding: 0.3rem 0.5rem;
-        gap: 0.75rem;
+    .arena-center {
+        padding: 2px;
+        gap: clamp(3px, 0.8vw, 6px);
     }
 
-    .turn-badge {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.75rem;
+    .turn-gem {
+        padding: clamp(2px, 0.4vh, 4px) clamp(6px, 1.5vw, 10px);
+        font-size: clamp(0.5rem, 1.7vw, 0.65rem);
     }
 
-    .btn-end-turn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
-        min-width: 80px;
+    .turn-counter {
+        font-size: clamp(0.4rem, 1.3vw, 0.55rem);
     }
 
-    .hand-zone {
-        padding: 0.3rem;
-        min-height: 75px;
+    .end-turn-button {
+        padding: clamp(3px, 0.5vh, 6px) clamp(8px, 2vw, 12px);
+        font-size: clamp(0.55rem, 1.8vw, 0.7rem);
+        min-width: clamp(60px, 18vw, 80px);
     }
 
+    .hand-tray {
+        padding: 2px;
+        max-height: clamp(50px, 10vh, 75px);
+    }
+
+    /* Hand cards - small phone viewport scaled */
     .hand-container .card {
-        width: 46px;
-        height: 64px;
+        width: clamp(35px, 10vw, 52px);
+        height: clamp(48px, 9vh, 68px);
+        max-height: calc(clamp(50px, 10vh, 75px) - 6px);
     }
 
     .hand-container .card-cost {
-        width: 16px;
-        height: 16px;
-        font-size: 0.6rem;
-        top: -5px;
-        left: -5px;
+        font-size: clamp(0.4rem, 1.5vw, 0.6rem);
+        width: clamp(12px, 3.5vw, 16px);
+        height: clamp(12px, 3.5vw, 16px);
     }
 
     .hand-container .card-name {
-        font-size: 0.4rem;
+        font-size: clamp(0.3rem, 1vw, 0.4rem);
     }
 
     .hand-container .card-attack,
     .hand-container .card-health {
-        font-size: 0.55rem;
+        font-size: clamp(0.4rem, 1.4vw, 0.55rem);
     }
 
     /* Position slots smaller */
     .position-slot {
-        width: 40px;
-        height: 55px;
+        width: clamp(32px, 9vw, 48px);
+        height: clamp(42px, 11vw, 62px);
     }
 
     .position-slot span {
-        font-size: 1.5rem;
+        font-size: clamp(1rem, 4vw, 1.5rem);
     }
 
     /* Rules screen */
@@ -883,45 +1140,79 @@ body {
     }
 
     .nav-links a {
-        padding: 0.4rem 0.5rem;
-        font-size: 0.75rem;
+        padding: 0.35rem 0.4rem;
+        font-size: 0.7rem;
     }
 
     #menu-screen h1 {
         font-size: 1.25rem;
     }
 
-    .player-portrait {
-        width: 36px;
-        height: 36px;
+    /* Game screen - extra small viewport scaling */
+    .hero-frame {
+        padding: 2px 3px;
+        gap: 2px;
     }
 
-    .portrait-health {
-        font-size: 0.9rem;
+    .hero-portrait {
+        width: clamp(24px, 7vw, 32px);
+        height: clamp(24px, 7vw, 32px);
+    }
+
+    .hero-health-orb {
+        font-size: clamp(0.45rem, 1.6vw, 0.6rem);
+        width: clamp(14px, 4.5vw, 18px);
+        height: clamp(14px, 4.5vw, 18px);
+    }
+
+    .hero-name {
+        font-size: clamp(0.4rem, 1.4vw, 0.55rem);
+    }
+
+    .resource {
+        font-size: clamp(0.4rem, 1.3vw, 0.5rem);
+        padding: 1px 2px;
     }
 
     .field-unit {
-        width: 38px;
-        height: 52px;
+        width: clamp(28px, 8vw, 40px);
+        height: clamp(36px, 10vw, 52px);
     }
 
-    .hand-container .card {
-        width: 42px;
-        height: 58px;
+    .lands-row {
+        min-height: clamp(18px, 3vh, 24px);
     }
 
     .land-card {
-        width: 22px;
-        height: 22px;
+        width: clamp(16px, 4vw, 22px);
+        height: clamp(20px, 5vw, 28px);
     }
 
-    .turn-badge {
-        font-size: 0.7rem;
+    .turn-gem {
+        font-size: clamp(0.45rem, 1.5vw, 0.6rem);
+        padding: 2px clamp(4px, 1.2vw, 8px);
     }
 
-    .btn-end-turn {
-        font-size: 0.75rem;
-        min-width: 70px;
+    .end-turn-button {
+        font-size: clamp(0.5rem, 1.6vw, 0.65rem);
+        min-width: clamp(50px, 16vw, 65px);
+        padding: 2px clamp(6px, 1.5vw, 10px);
+    }
+
+    .hand-tray {
+        max-height: clamp(45px, 9vh, 65px);
+    }
+
+    .hand-container .card {
+        width: clamp(30px, 9vw, 45px);
+        height: clamp(42px, 8vh, 58px);
+        max-height: calc(clamp(45px, 9vh, 65px) - 4px);
+    }
+
+    .hand-container .card-cost {
+        width: clamp(10px, 3vw, 14px);
+        height: clamp(10px, 3vw, 14px);
+        font-size: clamp(0.35rem, 1.2vw, 0.5rem);
     }
 }
 
@@ -947,110 +1238,421 @@ body {
 }
 
 @media (max-width: 768px) {
-    /* Card builder page - allow scrolling on mobile */
-    .card-builder-page {
-        overflow-y: auto;
-    }
-
-    .card-builder-page .builder-container {
-        height: auto;
-        min-height: 100vh;
-        overflow: visible;
-    }
-
+    /* Card builder - modules scroll within page */
     .builder-container {
+        padding: 0.5rem;
         height: auto;
         min-height: 100vh;
-        padding: 0.5rem;
+        min-height: 100dvh;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .builder-main {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
+        display: flex;
+        flex-direction: column;
         gap: 0.75rem;
         overflow: visible;
         flex: none;
     }
 
-    .builder-main .card-preview-panel {
-        grid-column: auto;
-        grid-row: auto;
+    /* Each panel gets fixed height with internal scrolling */
+    .builder-main > .panel {
+        flex: none;
+        height: 65vh;
+        min-height: 380px;
+        max-height: none;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
-    .builder-main .traits-panel,
-    .builder-main #panel-cards {
-        grid-row: auto;
-        max-height: 300px;
+    /* Panel headers stay fixed */
+    .builder-main .panel-header {
+        flex-shrink: 0;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: inherit;
     }
 
-    /* Card preview adjustments */
-    .card-preview-large {
-        width: 180px;
-        height: 250px;
+    /* Panel content areas scroll */
+    .builder-main .panel-content {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .points-display {
-        padding: 0.75rem 1.25rem;
+    /* Card Preview Panel (no panel-content wrapper) - special handling */
+    /* Use !important to ensure scrolling works despite parent overflow:hidden */
+    .builder-main > .card-preview-panel#panel-editor,
+    .card-preview-panel#panel-editor {
+        height: 70vh;
+        min-height: 450px;
+        max-height: 75vh;
+        overflow: auto !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding: clamp(0.5rem, 1.5vw, 0.75rem);
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(0.4rem, 1vh, 0.75rem);
     }
 
-    .points-value {
-        font-size: 2rem;
+    /* Sticky header for card preview panel */
+    .card-preview-panel#panel-editor .panel-header {
+        position: sticky;
+        top: calc(-1 * clamp(0.5rem, 1.5vw, 0.75rem));
+        margin: calc(-1 * clamp(0.5rem, 1.5vw, 0.75rem)) calc(-1 * clamp(0.5rem, 1.5vw, 0.75rem)) clamp(0.4rem, 1vh, 0.75rem) calc(-1 * clamp(0.5rem, 1.5vw, 0.75rem));
+        padding: clamp(0.5rem, 1.5vw, 0.75rem);
+        background: linear-gradient(145deg, var(--bg-medium) 0%, rgba(15, 25, 45, 0.98) 100%);
+        z-index: 10;
+        width: calc(100% + clamp(1rem, 3vw, 1.5rem));
     }
 
-    .sprite-selector {
-        max-width: 100%;
+    /* Card preview elements - uniform viewport-based scaling */
+    .card-preview-panel .points-display {
+        flex-shrink: 0;
+        margin: 0 auto;
+        min-width: clamp(80px, 20vw, 120px);
+        padding: clamp(0.3rem, 1vh, 0.5rem) clamp(0.6rem, 2vw, 1rem);
     }
 
-    .sprite-grid {
-        grid-template-columns: repeat(6, 1fr);
-        max-height: 120px;
+    .card-preview-panel .points-value {
+        font-size: clamp(1.25rem, 4vw, 1.75rem);
     }
 
-    .sprite-item {
-        width: 40px;
-        height: 40px;
+    .card-preview-panel .points-label {
+        font-size: clamp(0.55rem, 1.8vw, 0.75rem);
     }
 
-    .stat-controls {
-        max-width: 100%;
+    .card-preview-panel .card-preview-large {
+        width: clamp(100px, 28vw, 140px);
+        height: clamp(140px, 38vw, 190px);
+        margin: 0 auto;
+        flex-shrink: 0;
+        padding: clamp(0.4rem, 1.2vw, 0.75rem);
     }
 
-    .card-actions {
-        max-width: 100%;
+    .card-preview-panel .card-preview-large .card-cost {
+        width: clamp(22px, 6vw, 32px);
+        height: clamp(22px, 6vw, 32px);
+        font-size: clamp(0.7rem, 2.2vw, 1rem);
+        top: clamp(-6px, -1.5vw, -10px);
+        left: clamp(-6px, -1.5vw, -10px);
     }
 
-    /* Trait panel adjustments */
-    .traits-panel {
+    .card-preview-panel .card-sprite {
+        width: clamp(30px, 9vw, 50px);
+        height: clamp(30px, 9vw, 50px);
+    }
+
+    .card-preview-panel .card-sprite .sprite-icon {
+        font-size: clamp(1rem, 4vw, 1.5rem);
+    }
+
+    .card-preview-panel .card-name-input {
+        font-size: clamp(0.65rem, 2.2vw, 0.9rem);
+        padding: clamp(0.2rem, 0.6vw, 0.4rem);
+        margin-bottom: clamp(0.25rem, 0.8vw, 0.5rem);
+    }
+
+    .card-preview-panel .active-traits {
+        min-height: clamp(35px, 10vw, 60px);
+        padding: clamp(0.2rem, 0.6vw, 0.4rem);
+        margin: 0 auto;
+        width: 100%;
+        max-width: clamp(100px, 28vw, 140px);
+    }
+
+    .card-preview-panel .active-traits .trait-tag {
+        font-size: clamp(0.5rem, 1.6vw, 0.65rem);
+        padding: clamp(0.15rem, 0.4vw, 0.25rem) clamp(0.2rem, 0.6vw, 0.4rem);
+    }
+
+    .card-preview-panel .card-stats-row {
+        padding: clamp(0.15rem, 0.5vw, 0.3rem) clamp(0.25rem, 0.8vw, 0.5rem);
+    }
+
+    .card-preview-panel .card-stat {
+        font-size: clamp(0.75rem, 2.5vw, 1.1rem);
+    }
+
+    .card-preview-panel .stat-controls {
+        flex-shrink: 0;
+        max-width: clamp(220px, 70vw, 300px);
+        width: 100%;
+        margin: 0 auto;
+        padding: clamp(0.4rem, 1.2vw, 0.6rem);
+        gap: clamp(0.25rem, 0.8vw, 0.5rem);
+    }
+
+    .card-preview-panel .stat-control {
+        gap: clamp(0.3rem, 1vw, 0.5rem);
+    }
+
+    .card-preview-panel .stat-label {
+        width: clamp(50px, 15vw, 70px);
+        font-size: clamp(0.6rem, 2vw, 0.8rem);
+    }
+
+    .card-preview-panel .stat-value {
+        width: clamp(20px, 6vw, 30px);
+        font-size: clamp(0.7rem, 2.2vw, 0.95rem);
+    }
+
+    .card-preview-panel .sprite-selector {
+        flex-shrink: 0;
+        max-width: clamp(220px, 70vw, 300px);
+        width: 100%;
+        margin: 0 auto;
+        padding: clamp(0.4rem, 1.2vw, 0.6rem);
+    }
+
+    .card-preview-panel .sprite-selector h3 {
+        font-size: clamp(0.55rem, 1.8vw, 0.75rem);
+        margin-bottom: clamp(0.25rem, 0.8vw, 0.5rem);
+    }
+
+    .card-preview-panel .sprite-grid {
+        max-height: clamp(50px, 15vw, 80px);
+        gap: clamp(0.15rem, 0.5vw, 0.3rem);
+    }
+
+    .card-preview-panel .sprite-item {
+        width: clamp(26px, 8vw, 36px);
+        height: clamp(26px, 8vw, 36px);
+    }
+
+    .card-preview-panel .sprite-item .sprite-icon {
+        font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+    }
+
+    .card-preview-panel .card-actions {
+        flex-shrink: 0;
+        flex-direction: row;
+        max-width: clamp(220px, 70vw, 300px);
+        width: 100%;
+        margin: 0 auto;
+        justify-content: center;
+        gap: clamp(0.3rem, 1vw, 0.5rem);
+    }
+
+    .card-preview-panel .card-actions .btn {
+        flex: 1;
+        padding: clamp(0.4rem, 1.2vw, 0.6rem) clamp(0.5rem, 1.5vw, 0.8rem);
+        font-size: clamp(0.65rem, 2vw, 0.85rem);
+    }
+
+    .card-preview-panel .error-message {
+        margin: clamp(0.3rem, 1vw, 0.5rem) auto;
+        max-width: clamp(220px, 70vw, 300px);
+        font-size: clamp(0.6rem, 1.8vw, 0.75rem);
+        padding: clamp(0.3rem, 1vw, 0.5rem);
+    }
+
+    /* Wizard panel on mobile */
+    .wizard-panel {
+        max-width: none;
         min-width: auto;
+        height: 55vh;
+        min-height: 350px;
+    }
+
+    .wizard-panel .wizard-content {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        max-height: none;
+    }
+
+    /* Traits panel */
+    .builder-main .traits-panel {
+        height: 60vh;
+        min-height: 380px;
+    }
+
+    /* My Cards panel */
+    .builder-main #panel-cards {
+        height: 55vh;
+        min-height: 350px;
+    }
+
+    /* Scrollbar styling for mobile panels */
+    .card-preview-panel#panel-editor::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .card-preview-panel#panel-editor::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
+
+    .card-preview-panel#panel-editor::-webkit-scrollbar-thumb {
+        background: rgba(74, 144, 217, 0.5);
+        border-radius: 4px;
+    }
+
+    .card-preview-panel#panel-editor::-webkit-scrollbar-thumb:hover {
+        background: rgba(74, 144, 217, 0.7);
+    }
+
+    .builder-main .panel-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .builder-main .panel-content::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    .builder-main .panel-content::-webkit-scrollbar-thumb {
+        background: rgba(74, 144, 217, 0.4);
+        border-radius: 3px;
+    }
+
+    /* Traits in grid on mobile for better visibility */
+    .trait-categories {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .trait-category {
+        break-inside: avoid;
     }
 
     .trait-item {
-        padding: 0.5rem 0.6rem;
+        padding: 0.4rem 0.5rem;
     }
 
     .trait-name {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
 
     .trait-desc {
+        font-size: 0.6rem;
+    }
+
+    .trait-cost {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.35rem;
+    }
+
+    /* Sprite grid - more columns on mobile */
+    .sprite-grid {
+        grid-template-columns: repeat(6, 1fr);
+        max-height: 80px;
+    }
+
+    .sprite-item {
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Cards grid compact */
+    .cards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .card-mini {
+        padding: 0.4rem;
+    }
+
+    .card-mini-name {
         font-size: 0.65rem;
+    }
+
+    .card-mini-stats {
+        font-size: 0.65rem;
+    }
+}
+
+/* Small phones - fixed height modules, smaller elements */
+@media (max-width: 480px) {
+    /* Adjusted heights for small phones */
+    .builder-main > .panel {
+        height: 60vh;
+        min-height: 340px;
+    }
+
+    .builder-main > .card-preview-panel#panel-editor,
+    .card-preview-panel#panel-editor {
+        height: 65vh;
+        min-height: 400px;
+        max-height: 70vh;
+        overflow: auto !important;
+        overflow-y: auto !important;
+    }
+
+    .builder-main .traits-panel {
+        height: 55vh;
+        min-height: 320px;
+    }
+
+    .wizard-panel {
+        height: 50vh;
+        min-height: 300px;
+    }
+
+    .builder-main #panel-cards {
+        height: 50vh;
+        min-height: 300px;
+    }
+
+    /* Traits panel - single column */
+    .trait-categories {
+        grid-template-columns: 1fr;
+    }
+
+    .trait-item {
+        padding: clamp(0.25rem, 1vw, 0.35rem) clamp(0.3rem, 1.2vw, 0.4rem);
+    }
+
+    .trait-name {
+        font-size: clamp(0.65rem, 2.5vw, 0.75rem);
+    }
+
+    .trait-desc {
+        font-size: clamp(0.5rem, 1.8vw, 0.55rem);
+    }
+
+    .trait-cost {
+        font-size: clamp(0.55rem, 2vw, 0.65rem);
+        padding: clamp(0.1rem, 0.4vw, 0.15rem) clamp(0.2rem, 0.8vw, 0.3rem);
     }
 
     /* Cards grid */
     .cards-grid {
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: clamp(0.3rem, 1vw, 0.5rem);
     }
 
     .card-mini {
-        padding: 0.5rem;
+        padding: clamp(0.25rem, 1vw, 0.35rem);
+    }
+
+    .card-mini-cost {
+        width: clamp(16px, 5vw, 20px);
+        height: clamp(16px, 5vw, 20px);
+        font-size: clamp(0.5rem, 1.8vw, 0.6rem);
     }
 
     .card-mini-name {
-        font-size: 0.7rem;
+        font-size: clamp(0.5rem, 1.8vw, 0.6rem);
     }
 
     .card-mini-stats {
-        font-size: 0.7rem;
+        font-size: clamp(0.5rem, 1.8vw, 0.6rem);
+    }
+
+    /* Sprite grid adjustments */
+    .sprite-grid {
+        grid-template-columns: repeat(6, 1fr);
     }
 }
 
@@ -1073,7 +1675,7 @@ body {
 }
 
 @media (max-width: 768px) {
-    /* Deck builder page - allow scrolling on mobile */
+    /* Deck builder page - fixed height modules with page scroll */
     .deck-builder-page {
         overflow-y: auto;
     }
@@ -1081,55 +1683,60 @@ body {
     .deck-builder-page .builder-container {
         height: auto;
         min-height: 100vh;
+        min-height: 100dvh;
         overflow: visible;
     }
 
     .deck-builder-main {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
         overflow: visible;
         flex: none;
     }
 
     .deck-builder-left {
+        display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.75rem;
         overflow: visible;
     }
 
+    /* Fixed height panels */
     .deck-builder-left .panel {
         flex: none;
+        height: 50vh;
+        min-height: 300px;
         max-height: none;
-        height: auto;
-        overflow: visible;
+        overflow: hidden;
     }
 
     .deck-builder-left .panel .panel-content {
-        max-height: 250px;
+        flex: 1;
         overflow-y: auto;
     }
 
     .deck-builder-left #panel-saved {
-        max-height: none;
-    }
-
-    .deck-builder-left #panel-saved .panel-content {
-        max-height: 150px;
+        height: 25vh;
+        min-height: 150px;
     }
 
     .deck-builder-main #panel-deck {
-        grid-column: 1;
-        overflow: visible;
+        flex: none;
+        height: 50vh;
+        min-height: 300px;
+        overflow: hidden;
     }
 
     .deck-builder-page #panel-deck .panel-content {
-        max-height: 300px;
+        flex: 1;
         overflow-y: auto;
     }
 
     .deck-stats {
         gap: 0.5rem;
         padding: 0.75rem;
+        flex-shrink: 0;
     }
 
     .deck-stat-value {
@@ -1146,16 +1753,20 @@ body {
 }
 
 @media (max-width: 600px) {
-    .deck-builder-left .panel .panel-content {
-        max-height: 200px;
+    /* Slightly smaller fixed heights for 600px */
+    .deck-builder-left .panel {
+        height: 45vh;
+        min-height: 280px;
     }
 
-    .deck-builder-left #panel-saved .panel-content {
-        max-height: 120px;
+    .deck-builder-left #panel-saved {
+        height: 22vh;
+        min-height: 130px;
     }
 
-    #panel-deck .panel-content {
-        max-height: 250px;
+    .deck-builder-main #panel-deck {
+        height: 45vh;
+        min-height: 280px;
     }
 }
 
@@ -1165,30 +1776,47 @@ body {
 
 @media (max-height: 500px) and (orientation: landscape) {
     /* Compact everything for landscape phones */
-    .player-bar {
+    .hero-frame {
+        padding: 0.2rem 0.35rem;
+    }
+
+    .hero-portrait {
+        width: 32px;
+        height: 32px;
+    }
+
+    .hero-health-orb {
+        width: 15px;
+        height: 15px;
+        font-size: 0.55rem;
+    }
+
+    .battlefield {
+        min-height: 50px;
+    }
+
+    .lands-row {
+        min-height: 24px;
+    }
+
+    .arena-center {
+        padding: 0.2rem;
+        gap: 0.3rem;
+    }
+
+    .turn-gem {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.6rem;
+    }
+
+    .end-turn-button {
         padding: 0.25rem 0.5rem;
+        font-size: 0.6rem;
     }
 
-    .player-portrait {
-        width: 36px;
-        height: 36px;
-    }
-
-    .battlefield-zone {
-        min-height: 55px;
-    }
-
-    .lands-zone {
-        min-height: 28px;
-    }
-
-    .game-center-divider {
-        padding: 0.25rem;
-    }
-
-    .hand-zone {
-        min-height: 65px;
-        padding: 0.25rem;
+    .hand-tray {
+        min-height: 60px;
+        padding: 0.2rem;
     }
 
     .hand-container .card {
@@ -1199,5 +1827,2183 @@ body {
     .field-unit {
         width: 40px;
         height: 55px;
+    }
+
+    .land-card {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* ===================== */
+/* CARD WIZARD RESPONSIVE */
+/* ===================== */
+
+@media (max-width: 1200px) {
+    /* Hide wizard on medium screens - not enough space */
+    .wizard-panel {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    /* Show wizard on tablets/mobile as a separate section */
+    .wizard-panel {
+        display: block;
+        max-width: none;
+        min-width: auto;
+        order: -1; /* Show wizard first */
+    }
+
+    .builder-main {
+        grid-template-rows: auto auto auto auto;
+    }
+
+    .wizard-content {
+        max-height: 280px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .wizard-options {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .wizard-option {
+        padding: 0.5rem 0.3rem;
+    }
+
+    .wizard-option .option-icon {
+        font-size: 1.25rem;
+    }
+
+    .wizard-option .option-label {
+        font-size: 0.7rem;
+    }
+
+    .wizard-option .option-desc {
+        font-size: 0.55rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .wizard-panel {
+        max-height: none;
+    }
+
+    .wizard-content {
+        max-height: 350px;
+        padding: 0.5rem;
+    }
+
+    .wizard-intro {
+        font-size: 0.8rem;
+        padding: 0.4rem;
+    }
+
+    .wizard-step {
+        padding: 0.6rem;
+    }
+
+    .wizard-step-header {
+        margin-bottom: 0.5rem;
+    }
+
+    .step-number {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+    }
+
+    .step-title {
+        font-size: 0.8rem;
+    }
+
+    .wizard-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.4rem;
+    }
+
+    .wizard-option {
+        padding: 0.5rem;
+        min-height: 70px;
+    }
+
+    .wizard-option .option-icon {
+        font-size: 1.3rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .wizard-option .option-label {
+        font-size: 0.75rem;
+    }
+
+    .wizard-option .option-desc {
+        font-size: 0.6rem;
+    }
+
+    .wizard-actions {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
+    .wizard-actions .btn {
+        flex: 1;
+    }
+
+    .wizard-actions .btn-lg {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .wizard-summary {
+        padding: 0.5rem;
+    }
+
+    .wizard-summary h4 {
+        font-size: 0.7rem;
+        margin-bottom: 0.4rem;
+    }
+
+    #wizard-summary-content .summary-tag {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .wizard-content {
+        max-height: 300px;
+        gap: 0.75rem;
+    }
+
+    .wizard-step {
+        padding: 0.5rem;
+    }
+
+    .wizard-options {
+        gap: 0.35rem;
+    }
+
+    .wizard-option {
+        padding: 0.4rem;
+        min-height: 65px;
+    }
+
+    .wizard-option .option-icon {
+        font-size: 1.2rem;
+    }
+
+    .wizard-option .option-label {
+        font-size: 0.7rem;
+    }
+
+    .wizard-option .option-desc {
+        font-size: 0.55rem;
+        line-height: 1.15;
+    }
+
+    .wizard-actions .btn-lg {
+        padding: 0.65rem 0.8rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .wizard-panel {
+        padding: 0.75rem;
+    }
+
+    .wizard-panel .panel-header {
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .wizard-panel .panel-header h2 {
+        font-size: 1rem;
+    }
+
+    .wizard-content {
+        max-height: 280px;
+        gap: 0.6rem;
+    }
+
+    .wizard-intro {
+        font-size: 0.75rem;
+        padding: 0.35rem;
+    }
+
+    .wizard-step {
+        padding: 0.4rem;
+    }
+
+    .wizard-step-header {
+        gap: 0.4rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .step-number {
+        width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+    }
+
+    .step-title {
+        font-size: 0.75rem;
+    }
+
+    .wizard-options {
+        gap: 0.3rem;
+    }
+
+    .wizard-option {
+        padding: 0.35rem;
+        min-height: 60px;
+        border-radius: 8px;
+    }
+
+    .wizard-option .option-icon {
+        font-size: 1.1rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .wizard-option .option-label {
+        font-size: 0.65rem;
+    }
+
+    .wizard-option .option-desc {
+        font-size: 0.5rem;
+    }
+
+    .wizard-actions {
+        gap: 0.4rem;
+    }
+
+    .wizard-actions .btn {
+        min-height: 40px;
+    }
+
+    .wizard-actions .btn-lg {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .wizard-actions .btn-secondary {
+        font-size: 0.75rem;
+    }
+
+    .wizard-summary {
+        padding: 0.4rem;
+    }
+
+    #wizard-summary-content {
+        gap: 0.3rem;
+    }
+
+    #wizard-summary-content .summary-tag {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .wizard-content {
+        max-height: 250px;
+    }
+
+    .wizard-option {
+        min-height: 55px;
+    }
+
+    .wizard-option .option-icon {
+        font-size: 1rem;
+    }
+
+    .wizard-option .option-label {
+        font-size: 0.6rem;
+    }
+
+    .wizard-option .option-desc {
+        display: none; /* Hide descriptions on very small screens */
+    }
+
+    .step-title {
+        font-size: 0.7rem;
+    }
+}
+
+/* ===================== */
+/* BUILDER TOOLTIP MOBILE */
+/* ===================== */
+
+/* Hide hover tooltips on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .builder-tooltip {
+        display: none !important;
+    }
+}
+
+/* Smaller tooltips on tablets */
+@media (max-width: 1024px) {
+    .builder-tooltip {
+        min-width: 240px;
+        max-width: 300px;
+        padding: 0.75rem;
+    }
+
+    .builder-tooltip .trait-tooltip-name {
+        font-size: 1rem;
+    }
+
+    .builder-tooltip .trait-tooltip-desc {
+        font-size: 0.85rem;
+    }
+
+    .builder-tooltip .trait-tooltip-example-text {
+        font-size: 0.8rem;
+    }
+}
+
+/* Even smaller on mobile */
+@media (max-width: 768px) {
+    .builder-tooltip {
+        min-width: 200px;
+        max-width: 260px;
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .builder-tooltip .tooltip-header {
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.35rem;
+    }
+
+    .builder-tooltip .tooltip-name {
+        font-size: 0.95rem;
+    }
+
+    .builder-tooltip .tooltip-cost {
+        width: 24px;
+        height: 24px;
+        font-size: 0.85rem;
+    }
+
+    .builder-tooltip .tooltip-stats {
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .builder-tooltip .trait-tooltip-header {
+        margin-bottom: 0.35rem;
+    }
+
+    .builder-tooltip .trait-tooltip-name {
+        font-size: 0.95rem;
+    }
+
+    .builder-tooltip .trait-tooltip-cost {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .builder-tooltip .trait-tooltip-desc {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .builder-tooltip .trait-tooltip-example {
+        padding: 0.5rem;
+    }
+
+    .builder-tooltip .trait-tooltip-example-label {
+        font-size: 0.65rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .builder-tooltip .trait-tooltip-example-text {
+        font-size: 0.75rem;
+    }
+
+    .builder-tooltip .tooltip-trait {
+        padding: 0.4rem;
+    }
+
+    .builder-tooltip .tooltip-trait-name {
+        font-size: 0.8rem;
+    }
+
+    .builder-tooltip .tooltip-trait-desc {
+        font-size: 0.75rem;
+    }
+}
+
+/* ===================== */
+/* DECK WIZARD RESPONSIVE */
+/* ===================== */
+
+@media (max-width: 1200px) {
+    /* Hide deck wizard on medium screens - not enough space for 3 columns */
+    .deck-wizard-panel {
+        display: none;
+    }
+
+    .deck-builder-center {
+        display: flex;
+    }
+}
+
+@media (max-width: 1024px) {
+    /* Show deck wizard on tablets/mobile as a separate section */
+    .deck-wizard-panel {
+        display: block;
+        max-width: none;
+        min-width: auto;
+        max-height: none;
+        order: -1;
+    }
+
+    .deck-builder-main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+
+    .deck-builder-center {
+        order: 0;
+    }
+
+    #panel-deck {
+        order: 1;
+    }
+
+    .deck-wizard-panel .wizard-content {
+        max-height: 320px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .deck-wizard-panel .wizard-options {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .deck-wizard-panel .wizard-option {
+        padding: 0.5rem 0.3rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-icon {
+        font-size: 1.25rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-label {
+        font-size: 0.7rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-desc {
+        font-size: 0.55rem;
+    }
+
+    .trait-checkboxes {
+        max-height: 80px;
+    }
+
+    .wizard-analysis {
+        padding: 0.5rem;
+    }
+
+    .analysis-stats {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.35rem;
+    }
+
+    .analysis-stat {
+        padding: 0.3rem;
+    }
+
+    .analysis-stat-value {
+        font-size: 0.95rem;
+    }
+
+    .analysis-stat-label {
+        font-size: 0.55rem;
+    }
+
+    .mana-curve {
+        height: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .deck-wizard-panel {
+        max-height: none;
+    }
+
+    .deck-wizard-panel .wizard-content {
+        max-height: 380px;
+        padding: 0.5rem;
+    }
+
+    .deck-wizard-panel .wizard-intro {
+        font-size: 0.8rem;
+        padding: 0.4rem;
+    }
+
+    .deck-wizard-panel .wizard-step {
+        padding: 0.6rem;
+    }
+
+    .deck-wizard-panel .wizard-step-header {
+        margin-bottom: 0.5rem;
+    }
+
+    .deck-wizard-panel .step-number {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+    }
+
+    .deck-wizard-panel .step-title {
+        font-size: 0.8rem;
+    }
+
+    .deck-wizard-panel .wizard-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.4rem;
+    }
+
+    .deck-wizard-panel .wizard-option {
+        padding: 0.5rem;
+        min-height: 70px;
+    }
+
+    .deck-wizard-panel .wizard-option .option-icon {
+        font-size: 1.3rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-label {
+        font-size: 0.75rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-desc {
+        font-size: 0.6rem;
+    }
+
+    .wizard-warning {
+        padding: 0.5rem;
+    }
+
+    .wizard-warning .warning-icon {
+        font-size: 1rem;
+    }
+
+    .wizard-warning .warning-text {
+        font-size: 0.7rem;
+    }
+
+    .trait-checkboxes {
+        max-height: 100px;
+        gap: 0.3rem;
+    }
+
+    .trait-checkbox {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .trait-checkbox .checkbox-indicator {
+        width: 12px;
+        height: 12px;
+    }
+
+    .trait-checkbox .trait-count {
+        font-size: 0.6rem;
+    }
+
+    .deck-wizard-panel .wizard-actions {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
+    .deck-wizard-panel .wizard-actions .btn {
+        flex: 1;
+    }
+
+    .deck-wizard-panel .wizard-actions .btn-lg {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .deck-wizard-panel .wizard-summary {
+        padding: 0.5rem;
+    }
+
+    .deck-wizard-panel .wizard-summary h4 {
+        font-size: 0.7rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .analysis-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mana-curve {
+        height: 35px;
+        margin-top: 0.35rem;
+    }
+
+    .mana-bar-label {
+        font-size: 0.5rem;
+        bottom: -12px;
+    }
+
+    .mana-bar-count {
+        font-size: 0.5rem;
+        top: -10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .deck-wizard-panel .wizard-content {
+        max-height: 340px;
+        gap: 0.75rem;
+    }
+
+    .deck-wizard-panel .wizard-step {
+        padding: 0.5rem;
+    }
+
+    .deck-wizard-panel .wizard-options {
+        gap: 0.35rem;
+    }
+
+    .deck-wizard-panel .wizard-option {
+        padding: 0.4rem;
+        min-height: 65px;
+    }
+
+    .deck-wizard-panel .wizard-option .option-icon {
+        font-size: 1.2rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-label {
+        font-size: 0.7rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-desc {
+        font-size: 0.55rem;
+        line-height: 1.15;
+    }
+
+    .deck-wizard-panel .wizard-actions .btn-lg {
+        padding: 0.65rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .trait-checkboxes {
+        max-height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .deck-wizard-panel {
+        padding: 0.75rem;
+    }
+
+    .deck-wizard-panel .panel-header {
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .deck-wizard-panel .panel-header h2 {
+        font-size: 1rem;
+    }
+
+    .deck-wizard-panel .wizard-content {
+        max-height: 300px;
+        gap: 0.6rem;
+    }
+
+    .deck-wizard-panel .wizard-intro {
+        font-size: 0.75rem;
+        padding: 0.35rem;
+    }
+
+    .deck-wizard-panel .wizard-step {
+        padding: 0.4rem;
+    }
+
+    .deck-wizard-panel .wizard-step-header {
+        gap: 0.4rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .deck-wizard-panel .step-number {
+        width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+    }
+
+    .deck-wizard-panel .step-title {
+        font-size: 0.75rem;
+    }
+
+    .deck-wizard-panel .wizard-options {
+        gap: 0.3rem;
+    }
+
+    .deck-wizard-panel .wizard-option {
+        padding: 0.35rem;
+        min-height: 60px;
+        border-radius: 8px;
+    }
+
+    .deck-wizard-panel .wizard-option .option-icon {
+        font-size: 1.1rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-label {
+        font-size: 0.65rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-desc {
+        font-size: 0.5rem;
+    }
+
+    .deck-wizard-panel .wizard-actions {
+        gap: 0.4rem;
+    }
+
+    .deck-wizard-panel .wizard-actions .btn {
+        min-height: 40px;
+    }
+
+    .deck-wizard-panel .wizard-actions .btn-lg {
+        padding: 0.5rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .deck-wizard-panel .wizard-actions .btn-secondary {
+        font-size: 0.75rem;
+    }
+
+    .deck-wizard-panel .wizard-summary {
+        padding: 0.4rem;
+    }
+
+    .trait-checkboxes {
+        max-height: 70px;
+        gap: 0.25rem;
+    }
+
+    .trait-checkbox {
+        padding: 0.25rem 0.4rem;
+        font-size: 0.65rem;
+    }
+
+    .analysis-stat-value {
+        font-size: 0.85rem;
+    }
+
+    .analysis-stat-label {
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .deck-wizard-panel .wizard-content {
+        max-height: 280px;
+    }
+
+    .deck-wizard-panel .wizard-option {
+        min-height: 55px;
+    }
+
+    .deck-wizard-panel .wizard-option .option-icon {
+        font-size: 1rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-label {
+        font-size: 0.6rem;
+    }
+
+    .deck-wizard-panel .wizard-option .option-desc {
+        display: none;
+    }
+
+    .deck-wizard-panel .step-title {
+        font-size: 0.7rem;
+    }
+
+    .trait-checkboxes {
+        max-height: 60px;
+    }
+
+    .wizard-analysis {
+        display: none;
+    }
+}
+
+/* ===================== */
+/* MANA CRYSTAL BAR - RESPONSIVE */
+/* ===================== */
+
+@media (max-width: 1024px) {
+    .mana-crystal-bar {
+        padding: 0.3rem 0.6rem;
+    }
+
+    .mana-crystal {
+        width: 14px;
+        height: 18px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mana-crystal-bar {
+        padding: 0.25rem 0.5rem;
+        margin: 0.2rem auto;
+        border-radius: 15px;
+    }
+
+    .mana-crystals {
+        gap: 2px;
+        max-width: 280px;
+    }
+
+    .mana-crystal {
+        width: 12px;
+        height: 15px;
+        border-radius: 2px 2px 4px 4px;
+    }
+}
+
+@media (max-width: 600px) {
+    .mana-crystal-bar {
+        padding: 0.2rem 0.4rem;
+    }
+
+    .mana-crystals {
+        gap: 2px;
+        max-width: 240px;
+    }
+
+    .mana-crystal {
+        width: 10px;
+        height: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mana-crystal-bar {
+        padding: 0.15rem 0.35rem;
+    }
+
+    .mana-crystals {
+        gap: 1px;
+        max-width: 200px;
+    }
+
+    .mana-crystal {
+        width: 9px;
+        height: 11px;
+        border-radius: 1px 1px 3px 3px;
+    }
+}
+
+@media (max-width: 360px) {
+    .mana-crystal {
+        width: 8px;
+        height: 10px;
+    }
+
+    .mana-crystals {
+        max-width: 180px;
+    }
+}
+
+/* ===================== */
+/* OPPONENT CENTERED STATS - RESPONSIVE */
+/* ===================== */
+
+@media (max-width: 1024px) {
+    .opponent-stats-centered {
+        gap: 0.5rem;
+    }
+
+    .opponent-stat-box {
+        padding: 0.4rem 0.75rem;
+        min-width: 60px;
+    }
+
+    .opponent-stat-box .stat-icon {
+        font-size: 1rem;
+    }
+
+    .opponent-stat-box .stat-value {
+        font-size: 1rem;
+    }
+
+    .opponent-stat-box .stat-label {
+        font-size: 0.55rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .opponent-hero-frame.opponent-centered {
+        gap: 1rem;
+        padding: 0.4rem 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .opponent-stats-centered {
+        gap: 0.4rem;
+        order: 1;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .opponent-stat-box {
+        padding: 0.35rem 0.6rem;
+        min-width: 55px;
+        border-radius: 8px;
+    }
+
+    .opponent-stat-box .stat-icon {
+        font-size: 0.9rem;
+    }
+
+    .opponent-stat-box .stat-value {
+        font-size: 0.9rem;
+    }
+
+    .opponent-stat-box .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .hero-info.opponent-name-only {
+        position: static;
+        transform: none;
+        order: 2;
+    }
+
+    .opponent-hero-portrait {
+        order: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .opponent-hero-frame.opponent-centered {
+        gap: 0.6rem;
+        padding: 0.35rem 0.5rem;
+    }
+
+    .opponent-stats-centered {
+        gap: 0.3rem;
+    }
+
+    .opponent-stat-box {
+        padding: 0.3rem 0.5rem;
+        min-width: 48px;
+        border-radius: 6px;
+    }
+
+    .opponent-stat-box .stat-icon {
+        font-size: 0.8rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .opponent-stat-box .stat-value {
+        font-size: 0.8rem;
+    }
+
+    .opponent-stat-box .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .hero-info.opponent-name-only .hero-name {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .opponent-hero-frame.opponent-centered {
+        gap: 0.4rem;
+        padding: 0.3rem 0.4rem;
+    }
+
+    .opponent-stats-centered {
+        gap: 0.25rem;
+    }
+
+    .opponent-stat-box {
+        padding: 0.25rem 0.4rem;
+        min-width: 42px;
+        border-width: 1px;
+    }
+
+    .opponent-stat-box .stat-icon {
+        font-size: 0.7rem;
+    }
+
+    .opponent-stat-box .stat-value {
+        font-size: 0.75rem;
+    }
+
+    .opponent-stat-box .stat-label {
+        font-size: 0.4rem;
+        letter-spacing: 0.04em;
+    }
+
+    .hero-info.opponent-name-only {
+        display: none;
+    }
+}
+
+@media (max-width: 380px) {
+    .opponent-stat-box {
+        padding: 0.2rem 0.35rem;
+        min-width: 38px;
+    }
+
+    .opponent-stat-box .stat-icon {
+        font-size: 0.65rem;
+    }
+
+    .opponent-stat-box .stat-value {
+        font-size: 0.7rem;
+    }
+
+    .opponent-stat-box .stat-label {
+        display: none;
+    }
+}
+
+/* ===================== */
+/* FORTIFICATION LANDS - RESPONSIVE */
+/* ===================== */
+
+@media (max-width: 768px) {
+    .land-card {
+        width: 32px;
+        height: 38px;
+    }
+
+    .land-structure {
+        gap: 0.1rem;
+    }
+
+    .land-tower {
+        font-size: 1rem;
+    }
+
+    .land-health-bar {
+        height: 3px;
+    }
+
+    .land-health-text {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.2rem;
+    }
+
+    .land-button {
+        padding: 0.3rem 0.5rem;
+    }
+
+    .land-btn-icon {
+        font-size: 0.85rem;
+    }
+
+    .land-btn-text {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .land-card {
+        width: 28px;
+        height: 34px;
+    }
+
+    .land-tower {
+        font-size: 0.9rem;
+    }
+
+    .land-health-text {
+        font-size: 0.5rem;
+    }
+
+    .land-button {
+        padding: 0.25rem 0.4rem;
+    }
+
+    .land-btn-icon {
+        font-size: 0.75rem;
+    }
+
+    .land-btn-text {
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .land-card {
+        width: 24px;
+        height: 30px;
+    }
+
+    .land-tower {
+        font-size: 0.8rem;
+    }
+
+    .land-base {
+        height: 3px;
+    }
+
+    .land-health-bar {
+        height: 2px;
+    }
+
+    .land-health-text {
+        font-size: 0.45rem;
+        padding: 0.05rem 0.15rem;
+    }
+
+    .land-glow {
+        display: none;
+    }
+
+    .land-button {
+        padding: 0.2rem 0.35rem;
+    }
+
+    .land-btn-icon {
+        font-size: 0.7rem;
+    }
+
+    .land-btn-text {
+        font-size: 0.55rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .land-card {
+        width: 22px;
+        height: 26px;
+    }
+
+    .land-tower {
+        font-size: 0.7rem;
+    }
+
+    .land-health-text {
+        font-size: 0.4rem;
+    }
+}
+
+/* Landscape phone - compact lands */
+@media (max-height: 500px) and (orientation: landscape) {
+    .land-card {
+        width: 20px;
+        height: 24px;
+    }
+
+    .land-tower {
+        font-size: 0.65rem;
+    }
+
+    .land-health-text {
+        display: none;
+    }
+
+    .land-button {
+        padding: 0.15rem 0.3rem;
+    }
+
+    .mana-crystal-bar {
+        padding: 0.1rem 0.3rem;
+    }
+
+    .mana-crystal {
+        width: 7px;
+        height: 9px;
+    }
+
+    .opponent-hero-frame.opponent-centered,
+    .player-hero-frame.player-centered {
+        gap: 0.4rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .opponent-stat-box,
+    .player-stat-box {
+        padding: 0.15rem 0.3rem;
+        min-width: 35px;
+    }
+
+    .opponent-stat-box .stat-label,
+    .player-stat-box .stat-label {
+        display: none;
+    }
+}
+
+/* ===================== */
+/* CENTERED PLAYER STATS - RESPONSIVE */
+/* ===================== */
+
+/* Tablets and smaller */
+@media (max-width: 1024px) {
+    .player-stats-centered {
+        gap: 0.5rem;
+    }
+
+    .player-stat-box {
+        padding: 0.4rem 0.75rem;
+        min-width: 60px;
+    }
+
+    .player-stat-box .stat-icon {
+        font-size: 1rem;
+    }
+
+    .player-stat-box .stat-value {
+        font-size: 1rem;
+    }
+
+    .player-stat-box .stat-label {
+        font-size: 0.55rem;
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 768px) {
+    .player-hero-frame.player-centered {
+        gap: 1rem;
+        padding: 0.4rem 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .player-stats-centered {
+        gap: 0.4rem;
+        order: 1;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .player-stat-box {
+        padding: 0.35rem 0.6rem;
+        min-width: 55px;
+        border-radius: 8px;
+    }
+
+    .player-stat-box .stat-icon {
+        font-size: 0.9rem;
+    }
+
+    .player-stat-box .stat-value {
+        font-size: 0.9rem;
+    }
+
+    .player-stat-box .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .hero-info.player-name-only {
+        position: static;
+        transform: none;
+        order: 2;
+    }
+
+    .player-hero-portrait {
+        order: 0;
+    }
+}
+
+/* Small phones */
+@media (max-width: 600px) {
+    .player-hero-frame.player-centered {
+        gap: 0.6rem;
+        padding: 0.35rem 0.5rem;
+    }
+
+    .player-stats-centered {
+        gap: 0.3rem;
+    }
+
+    .player-stat-box {
+        padding: 0.3rem 0.5rem;
+        min-width: 48px;
+        border-radius: 6px;
+    }
+
+    .player-stat-box .stat-icon {
+        font-size: 0.8rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .player-stat-box .stat-value {
+        font-size: 0.8rem;
+    }
+
+    .player-stat-box .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .hero-info.player-name-only .hero-name {
+        font-size: 0.7rem;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 480px) {
+    .player-hero-frame.player-centered {
+        gap: 0.4rem;
+        padding: 0.3rem 0.4rem;
+    }
+
+    .player-stats-centered {
+        gap: 0.25rem;
+    }
+
+    .player-stat-box {
+        padding: 0.25rem 0.4rem;
+        min-width: 42px;
+        border-width: 1px;
+    }
+
+    .player-stat-box .stat-icon {
+        font-size: 0.7rem;
+    }
+
+    .player-stat-box .stat-value {
+        font-size: 0.75rem;
+    }
+
+    .player-stat-box .stat-label {
+        font-size: 0.4rem;
+        letter-spacing: 0.04em;
+    }
+
+    .hero-info.player-name-only {
+        display: none;
+    }
+}
+
+/* Tiny phones */
+@media (max-width: 380px) {
+    .player-stat-box {
+        padding: 0.2rem 0.35rem;
+        min-width: 38px;
+    }
+
+    .player-stat-box .stat-icon {
+        font-size: 0.65rem;
+    }
+
+    .player-stat-box .stat-value {
+        font-size: 0.7rem;
+    }
+
+    .player-stat-box .stat-label {
+        display: none;
+    }
+}
+
+/* Landscape phone orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+    .player-hero-frame.player-centered {
+        gap: 0.5rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .player-stats-centered {
+        gap: 0.3rem;
+    }
+
+    .player-stat-box {
+        padding: 0.2rem 0.4rem;
+        min-width: 40px;
+    }
+
+    .player-stat-box .stat-icon {
+        font-size: 0.65rem;
+    }
+
+    .player-stat-box .stat-value {
+        font-size: 0.7rem;
+    }
+
+    .player-stat-box .stat-label {
+        display: none;
+    }
+
+    .hero-info.player-name-only {
+        display: none;
+    }
+}
+
+/* ===================== */
+/* MOBILE BUTTON TOUCH HANDLING */
+/* ===================== */
+
+/* Ensure buttons work properly on touch devices */
+@media (max-width: 768px) {
+    .btn,
+    button,
+    .lobby-actions .btn,
+    .land-button,
+    .end-turn-button {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        cursor: pointer;
+    }
+
+    /* Remove hover effects on touch - use active instead */
+    .btn:active:not(:disabled) {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* ===================== */
+/* GAME SCREEN - MOBILE IMPROVEMENTS */
+/* ===================== */
+
+/* Tablet and below - cleaner game layout */
+@media (max-width: 768px) {
+    /* Game screen fills viewport with safe area padding */
+    #game-screen {
+        padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 4px) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 4px);
+        gap: 0;
+        height: 100vh;
+        height: 100dvh;
+        box-sizing: border-box;
+    }
+
+    /* Game board - optimize vertical space */
+    .game-board {
+        padding: 4px;
+        gap: 2px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+
+    /* Remove decorative overlays on mobile for performance */
+    .game-board::before,
+    .game-board::after {
+        display: none;
+    }
+
+    /* Game sides - equal flex distribution */
+    .game-side {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 0 2px;
+    }
+
+    /* Hero frames - compact horizontal layout */
+    .hero-frame {
+        padding: 0.4rem 0.75rem;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        margin: 2px 4px;
+    }
+
+    .opponent-hero-frame {
+        padding-top: 0.5rem;
+        margin-top: 4px;
+    }
+
+    .player-hero-frame {
+        padding-bottom: 0.5rem;
+        margin-bottom: 4px;
+    }
+
+    /* Hero portrait - use CSS variables */
+    .hero-portrait {
+        width: var(--hero-size);
+        height: var(--hero-size);
+        flex-shrink: 0;
+    }
+
+    .hero-portrait-inner {
+        border-width: 2px;
+    }
+
+    .hero-health-orb {
+        width: var(--hero-orb-size);
+        height: var(--hero-orb-size);
+        border-width: 2px;
+        font-size: clamp(0.55rem, 2vw, 0.75rem);
+    }
+
+    /* Hero info - compact */
+    .hero-info {
+        gap: 0.2rem;
+        min-width: 0;
+    }
+
+    .hero-name {
+        font-size: clamp(0.6rem, 2.2vw, 0.8rem);
+    }
+
+    .hero-resources {
+        gap: 0.3rem;
+        flex-wrap: wrap;
+    }
+
+    .resource {
+        font-size: clamp(0.55rem, 1.8vw, 0.7rem);
+        padding: 0.15rem 0.35rem;
+        gap: 0.2rem;
+    }
+
+    .resource-icon {
+        font-size: clamp(0.6rem, 2vw, 0.75rem);
+    }
+
+    /* Lands row - compact */
+    .lands-row {
+        padding: 0.3rem 0.75rem;
+        min-height: auto;
+        gap: 0.5rem;
+        flex-shrink: 0;
+        margin: 2px 4px;
+        border-radius: 6px;
+        background: rgba(45, 80, 22, 0.1);
+    }
+
+    .lands-container {
+        gap: clamp(3px, 1vw, 6px);
+    }
+
+    .land-card {
+        width: var(--land-width);
+        height: var(--land-height);
+        border-radius: 4px;
+        border-width: 1px;
+    }
+
+    .land-tower {
+        font-size: clamp(0.7rem, 2.5vw, 1rem);
+    }
+
+    .land-health-text {
+        font-size: clamp(0.4rem, 1.5vw, 0.5rem);
+        padding: 0 2px;
+    }
+
+    .land-button {
+        padding: 0.35rem 0.6rem;
+        font-size: clamp(0.6rem, 2vw, 0.75rem);
+        gap: 0.3rem;
+        min-height: 36px;
+        touch-action: manipulation;
+    }
+
+    .land-btn-icon {
+        font-size: clamp(0.7rem, 2.2vw, 0.9rem);
+    }
+
+    /* Battlefield - take remaining space */
+    .battlefield {
+        flex: 1;
+        padding: 0.35rem 0.75rem;
+        min-height: 0;
+        margin: 2px 4px;
+    }
+
+    .battlefield-inner {
+        padding: 0.5rem;
+        border-radius: 10px;
+        min-height: calc(var(--field-card-height) + 0.75rem);
+        height: 100%;
+    }
+
+    .units-container {
+        gap: clamp(6px, 1.5vw, 10px);
+    }
+
+    /* Field units - use CSS variables */
+    .field-unit {
+        width: var(--field-card-width);
+        height: var(--field-card-height);
+        border-radius: 6px;
+        padding: 0.2rem;
+    }
+
+    .field-unit .card-cost {
+        width: clamp(14px, 4vw, 20px);
+        height: clamp(14px, 4vw, 20px);
+        font-size: clamp(0.5rem, 1.6vw, 0.65rem);
+        top: -6px;
+        left: -6px;
+        border-width: 1px;
+    }
+
+    .field-unit .card-name {
+        font-size: clamp(0.35rem, 1.2vw, 0.45rem);
+        padding: 0.1rem;
+        margin-top: 0.2rem;
+    }
+
+    .field-unit .card-stats {
+        padding: 0.15rem 0.2rem;
+    }
+
+    .field-unit .card-attack,
+    .field-unit .card-health {
+        font-size: clamp(0.55rem, 1.8vw, 0.7rem);
+    }
+
+    /* Arena center - compact turn controls */
+    .arena-center {
+        padding: 0.4rem 0.75rem;
+        gap: 1rem;
+        min-height: auto;
+        flex-shrink: 0;
+        margin: 4px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+    }
+
+    .arena-divider {
+        display: none;
+    }
+
+    .turn-display {
+        gap: 0.2rem;
+    }
+
+    .turn-gem {
+        padding: 0.4rem 0.75rem;
+        font-size: clamp(0.65rem, 2.2vw, 0.8rem);
+        border-radius: 15px;
+    }
+
+    .turn-counter {
+        font-size: clamp(0.55rem, 1.8vw, 0.65rem);
+    }
+
+    .end-turn-button {
+        padding: 0.5rem 1rem;
+        font-size: clamp(0.7rem, 2.4vw, 0.9rem);
+        min-width: 80px;
+        min-height: 40px;
+        border-radius: 8px;
+        touch-action: manipulation;
+    }
+
+    /* Hand tray - horizontal scrolling */
+    .hand-tray {
+        padding: 0.5rem 0.75rem;
+        padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0));
+        flex-shrink: 0;
+        max-height: calc(var(--card-height) + 2rem);
+        margin: 4px;
+        margin-bottom: 0;
+        border-radius: 8px 8px 0 0;
+        background: linear-gradient(180deg,
+            rgba(0, 0, 0, 0.4) 0%,
+            rgba(10, 20, 35, 0.95) 100%);
+    }
+
+    .hand-tray-inner {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .hand-container {
+        gap: clamp(6px, 1.5vw, 10px);
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+        padding: 4px 0;
+        scrollbar-width: thin;
+    }
+
+    /* Hand cards */
+    .hand-container .card {
+        width: var(--card-width);
+        height: var(--card-height);
+        flex-shrink: 0;
+        border-radius: 6px;
+        padding: 0.25rem;
+        touch-action: manipulation;
+    }
+
+    .hand-container .card-cost {
+        width: clamp(20px, 5.5vw, 26px);
+        height: clamp(20px, 5.5vw, 26px);
+        font-size: clamp(0.6rem, 2vw, 0.8rem);
+        top: -8px;
+        left: -8px;
+    }
+
+    .hand-container .card-name {
+        font-size: clamp(0.45rem, 1.5vw, 0.55rem);
+        margin-top: 0.3rem;
+    }
+
+    .hand-container .card-stats {
+        padding: 0.2rem 0.25rem;
+    }
+
+    .hand-container .card-attack,
+    .hand-container .card-health {
+        font-size: clamp(0.65rem, 2.2vw, 0.8rem);
+    }
+
+    /* Mana crystal bar - compact */
+    .mana-crystal-bar {
+        padding: 0.25rem 0.6rem;
+        border-radius: 14px;
+        margin: 0.2rem auto;
+    }
+
+    .mana-crystals {
+        gap: 2px;
+        max-width: 85vw;
+    }
+
+    .mana-crystal {
+        width: var(--crystal-width);
+        height: var(--crystal-height);
+        border-radius: 2px 2px 4px 4px;
+    }
+
+    .mana-crystal-separator {
+        width: 1px;
+        height: 12px;
+        margin: 0 2px;
+    }
+
+    /* Position slots for card placement */
+    .position-slot {
+        width: var(--field-card-width);
+        height: var(--field-card-height);
+        border-radius: 6px;
+    }
+
+    .position-slot span {
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+    }
+
+    /* Target overlay */
+    .target-overlay-content {
+        padding: 0.75rem 1.25rem;
+    }
+
+    .target-overlay-content p {
+        font-size: clamp(0.8rem, 2.5vw, 1rem);
+    }
+
+    /* Damage popup */
+    .damage-popup {
+        font-size: clamp(1.25rem, 4vw, 1.75rem);
+    }
+
+    /* Game message */
+    .game-message {
+        padding: 0.5rem 1rem;
+        font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+        max-width: 90%;
+    }
+
+    /* Card selection overlay */
+    .card-selection-overlay {
+        padding: 0.75rem;
+    }
+
+    .card-selection-prompt {
+        padding: 0.75rem 1rem;
+        max-width: 95%;
+    }
+
+    .card-selection-prompt h3 {
+        font-size: clamp(0.9rem, 3vw, 1.1rem);
+    }
+}
+
+/* Small phones - more aggressive scaling */
+@media (max-width: 480px) {
+    /* Game board padding */
+    .game-board {
+        padding: 3px;
+    }
+
+    .game-side {
+        padding: 0 2px;
+    }
+
+    /* Hero frames - even more compact */
+    .hero-frame {
+        padding: 0.3rem 0.5rem;
+        gap: 0.4rem;
+        margin: 2px 3px;
+    }
+
+    .hero-portrait-inner {
+        font-size: 0.8rem;
+    }
+
+    .hero-info {
+        gap: 0.15rem;
+    }
+
+    .hero-resources {
+        gap: 0.2rem;
+    }
+
+    .resource {
+        padding: 0.12rem 0.3rem;
+        font-size: clamp(0.5rem, 1.6vw, 0.6rem);
+    }
+
+    /* Lands row */
+    .lands-row {
+        padding: 0.25rem 0.5rem;
+        gap: 0.4rem;
+        margin: 2px 3px;
+    }
+
+    .land-button {
+        padding: 0.3rem 0.5rem;
+        min-height: 32px;
+    }
+
+    /* Battlefield */
+    .battlefield {
+        padding: 0.25rem 0.5rem;
+        margin: 2px 3px;
+    }
+
+    .battlefield-inner {
+        padding: 0.35rem;
+        border-radius: 8px;
+    }
+
+    .field-unit .card-name {
+        display: none; /* Hide names on very small screens */
+    }
+
+    /* Arena center */
+    .arena-center {
+        padding: 0.3rem 0.5rem;
+        gap: 0.75rem;
+        margin: 3px;
+    }
+
+    .turn-gem {
+        padding: 0.3rem 0.6rem;
+        border-radius: 12px;
+    }
+
+    .end-turn-button {
+        padding: 0.4rem 0.75rem;
+        min-height: 36px;
+        min-width: 70px;
+    }
+
+    /* Hand tray */
+    .hand-tray {
+        padding: 0.4rem 0.5rem;
+        padding-bottom: calc(0.4rem + env(safe-area-inset-bottom, 0));
+        margin: 3px;
+        margin-bottom: 0;
+    }
+
+    .hand-container .card-name {
+        font-size: 0.4rem;
+    }
+
+    /* Mana crystals */
+    .mana-crystal-bar {
+        padding: 0.2rem 0.4rem;
+    }
+
+    .mana-crystals {
+        gap: 1px;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 360px) {
+    .game-board {
+        padding: 2px;
+    }
+
+    .hero-frame {
+        padding: 0.25rem 0.4rem;
+        gap: 0.3rem;
+        margin: 1px 2px;
+    }
+
+    .hero-name {
+        display: none; /* Hide name on tiny screens */
+    }
+
+    .lands-row {
+        padding: 0.2rem 0.4rem;
+        margin: 1px 2px;
+    }
+
+    .battlefield {
+        margin: 1px 2px;
+    }
+
+    .arena-center {
+        gap: 0.5rem;
+        padding: 0.25rem 0.4rem;
+        margin: 2px;
+    }
+
+    .turn-gem {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .end-turn-button {
+        padding: 0.35rem 0.6rem;
+        min-height: 32px;
+        min-width: 60px;
+    }
+
+    .hand-tray {
+        padding: 0.3rem 0.4rem;
+        padding-bottom: calc(0.3rem + env(safe-area-inset-bottom, 0));
+        margin: 2px;
+        margin-bottom: 0;
+    }
+
+    .hand-container .card-name {
+        display: none;
+    }
+}
+
+/* Landscape phone - optimize for horizontal space */
+@media (max-height: 500px) and (orientation: landscape) {
+    #game-screen {
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    .game-board {
+        flex-direction: row;
+        padding: 0;
+    }
+
+    .game-side {
+        flex: 1;
+        flex-direction: column;
+    }
+
+    /* Compact hero frames */
+    .hero-frame {
+        padding: 0.15rem 0.35rem;
+        gap: 0.3rem;
+    }
+
+    .hero-portrait {
+        width: clamp(28px, 6vh, 38px);
+        height: clamp(28px, 6vh, 38px);
+    }
+
+    .hero-health-orb {
+        width: clamp(14px, 3vh, 18px);
+        height: clamp(14px, 3vh, 18px);
+        font-size: 0.5rem;
+    }
+
+    .hero-name {
+        display: none;
+    }
+
+    .resource {
+        padding: 0.1rem 0.2rem;
+        font-size: 0.5rem;
+    }
+
+    /* Compact lands */
+    .lands-row {
+        padding: 0.1rem 0.25rem;
+        min-height: 22px;
+    }
+
+    .land-card {
+        width: clamp(16px, 3.5vh, 22px);
+        height: clamp(20px, 4.5vh, 28px);
+    }
+
+    .land-tower {
+        font-size: 0.6rem;
+    }
+
+    .land-button {
+        padding: 0.15rem 0.3rem;
+        font-size: 0.5rem;
+    }
+
+    /* Compact battlefield */
+    .battlefield {
+        padding: 0.15rem 0.25rem;
+        flex: 1;
+    }
+
+    .battlefield-inner {
+        padding: 0.2rem;
+        min-height: auto;
+    }
+
+    .field-unit {
+        width: clamp(35px, 7vh, 48px);
+        height: clamp(48px, 9.5vh, 62px);
+    }
+
+    .field-unit .card-cost {
+        width: 14px;
+        height: 14px;
+        font-size: 0.45rem;
+        top: -4px;
+        left: -4px;
+    }
+
+    .field-unit .card-name {
+        display: none;
+    }
+
+    .field-unit .card-attack,
+    .field-unit .card-health {
+        font-size: 0.5rem;
+    }
+
+    /* Arena center */
+    .arena-center {
+        padding: 0.15rem;
+        gap: 0.35rem;
+    }
+
+    .turn-gem {
+        padding: 0.15rem 0.35rem;
+        font-size: 0.55rem;
+    }
+
+    .turn-counter {
+        display: none;
+    }
+
+    .end-turn-button {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.55rem;
+    }
+
+    /* Hand tray - horizontal scroll */
+    .hand-tray {
+        padding: 0.15rem;
+        max-height: calc(var(--card-height) + 0.5rem);
+    }
+
+    .hand-container {
+        gap: 3px;
+    }
+
+    .hand-container .card {
+        width: clamp(38px, 7.5vh, 52px);
+        height: clamp(52px, 10vh, 70px);
+    }
+
+    .hand-container .card-cost {
+        width: 14px;
+        height: 14px;
+        font-size: 0.5rem;
+        top: -4px;
+        left: -4px;
+    }
+
+    .hand-container .card-name {
+        display: none;
+    }
+
+    .hand-container .card-attack,
+    .hand-container .card-health {
+        font-size: 0.5rem;
+    }
+
+    /* Mana crystals */
+    .mana-crystal-bar {
+        padding: 0.1rem 0.25rem;
+    }
+
+    .mana-crystal {
+        width: 6px;
+        height: 8px;
+    }
+}
+
+/* ===================== */
+/* TRAIT EFFECTS - MOBILE ADJUSTMENTS */
+/* ===================== */
+
+/* Reduce animation intensity on mobile for performance */
+@media (max-width: 768px) {
+    .card.trait-stealth::before,
+    .card.trait-divine_shield::before,
+    .card.trait-taunt::before,
+    .card.trait-charge::before,
+    .card.trait-inspire::before,
+    .card.trait-rally::before,
+    .card.trait-guardian::before {
+        animation-duration: 3s;
+    }
+
+    /* Reduce glow effects on mobile */
+    .card[class*="trait-"]::after {
+        box-shadow: none;
+    }
+
+    /* Hide some decorative elements */
+    .card.trait-ranged::before,
+    .card.trait-piercing::before,
+    .card.trait-frenzy::before,
+    .card.trait-deathtouch::before {
+        font-size: 0.6rem;
+    }
+}
+
+/* Disable most effects on very small screens */
+@media (max-width: 480px) {
+    .card.trait-armor::before,
+    .card.trait-swift::before,
+    .card.trait-rally::before,
+    .card.trait-inspire::before,
+    .card.trait-vampiric::before,
+    .card.trait-elusive::before,
+    .card.trait-overpower::before,
+    .card.trait-cursed::before,
+    .card.trait-exhausting::before {
+        display: none;
+    }
+
+    /* Keep only essential indicators */
+    .card.trait-taunt::before {
+        border-width: 2px;
+    }
+
+    .card.trait-divine_shield::before {
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
     }
 }

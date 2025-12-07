@@ -20,6 +20,10 @@ const STAT_COSTS = {
     manaCost: -3    // -1 Mana Cost costs 3 points (reducing cost is expensive)
 };
 
+// Special restrictions for 0-cost cards
+const ZERO_COST_PENALTY = 5;  // Additional point cost for 0 mana cards
+const ZERO_COST_MAX_TRAITS = 1;  // Max traits allowed on 0 cost cards
+
 // Positive traits (cost points)
 const POSITIVE_TRAITS = {
     swift: {
@@ -347,6 +351,11 @@ function calculatePointCost(cardData) {
 
     cost += manaDiff * Math.abs(STAT_COSTS.manaCost);
 
+    // Zero-cost penalty: 0 mana cards cost an additional 5 points
+    if (cardData.manaCost === 0) {
+        cost += ZERO_COST_PENALTY;
+    }
+
     // Trait costs
     if (cardData.traits && Array.isArray(cardData.traits)) {
         cardData.traits.forEach(traitId => {
@@ -409,9 +418,33 @@ function validateCard(cardData) {
             errors.push('Cannot have both Swift and Slow');
         }
 
+        const hasTaunt = cardData.traits.includes('taunt');
+        const hasStealth = cardData.traits.includes('stealth');
+        if (hasTaunt && hasStealth) {
+            errors.push('Cannot have both Taunt and Stealth');
+        }
+
+        // Ranged + Retaliate: Retaliate is useless on ranged (no counter-attack)
+        const hasRanged = cardData.traits.includes('ranged');
+        const hasRetaliate = cardData.traits.includes('retaliate');
+        if (hasRanged && hasRetaliate) {
+            errors.push('Cannot have both Ranged and Retaliate (Ranged prevents counter-attacks)');
+        }
+
+        // Pacifist + Cowardly: Pacifist can only attack units, cowardly restricts which units
+        // This is allowed - they work together
+
+        // Frail + Armor/Divine Shield: These work together, frail still dies if any damage gets through
+        // This is allowed
+
         // Check max traits limit
         if (cardData.traits.length > MAX_TRAITS) {
             errors.push(`Card can have at most ${MAX_TRAITS} traits`);
+        }
+
+        // Check 0-cost card trait restriction
+        if (cardData.manaCost === 0 && cardData.traits.length > ZERO_COST_MAX_TRAITS) {
+            errors.push(`0-cost cards can have at most ${ZERO_COST_MAX_TRAITS} trait`);
         }
     }
 
@@ -457,6 +490,8 @@ module.exports = {
     MAX_TRAITS,
     BASE_STATS,
     STAT_COSTS,
+    ZERO_COST_PENALTY,
+    ZERO_COST_MAX_TRAITS,
     POSITIVE_TRAITS,
     NEGATIVE_TRAITS,
     ALL_TRAITS,

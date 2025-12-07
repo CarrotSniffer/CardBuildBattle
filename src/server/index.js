@@ -11,17 +11,39 @@ const auth = require('./auth');
 const { validateCard, POSITIVE_TRAITS, NEGATIVE_TRAITS, POINT_BUDGET, BASE_STATS, STAT_COSTS, MAX_TRAITS } = require('../shared/pointSystem');
 const { CARD_SPRITES, getAvailableSprites, getSpriteById } = require('../shared/cardSprites');
 
+// Performance: Force garbage collection periodically if exposed
+if (global.gc) {
+    setInterval(() => {
+        global.gc();
+    }, 60000); // Every minute
+}
+
 const app = express();
 const server = http.createServer(app);
+
+// Performance: Increase max listeners to prevent memory leak warnings
+server.setMaxListeners(50);
 
 // Trust proxy for platforms like Railway, Render, Heroku
 app.set('trust proxy', 1);
 
-// Parse JSON bodies
-app.use(express.json());
+// Parse JSON bodies with size limit for performance
+app.use(express.json({ limit: '1mb' }));
+
+// Performance: Disable etag for faster responses
+app.set('etag', false);
 
 // WebSocket server with ping/pong to keep connections alive
-const wss = new WebSocket.Server({ server });
+// Performance: Optimized settings for lower latency
+const wss = new WebSocket.Server({
+    server,
+    perMessageDeflate: false, // Disable compression for lower latency (trades bandwidth for speed)
+    maxPayload: 1024 * 1024   // 1MB max payload
+});
+
+// Performance: Debounce tracking for game state broadcasts
+const pendingBroadcasts = new Map();
+const BROADCAST_DEBOUNCE_MS = 16; // ~60fps max update rate
 
 const PORT = process.env.PORT || 3000;
 
@@ -45,6 +67,14 @@ const players = new Map();
 
 // Active bots: botId -> ServerBot instance
 const activeBots = new Map();
+
+// Expose stats for cluster mode monitoring
+global.activeConnections = 0;
+global.activeGames = 0;
+setInterval(() => {
+    global.activeConnections = players.size;
+    global.activeGames = gameManager.games ? gameManager.games.size : 0;
+}, 5000);
 
 // Health check endpoint for hosting platforms
 app.get('/health', (req, res) => {
@@ -804,6 +834,9 @@ function broadcastGameState(gameId) {
     const game = gameManager.getGame(gameId);
     if (!game) return;
 
+    // Performance: Pre-serialize common data structure
+    const baseMessage = { type: 'game_state' };
+
     // Send personalized game state to each player (hide opponent's hand)
     [game.player1Id, game.player2Id].forEach(pId => {
         const state = gameManager.getGameStateForPlayer(gameId, pId);
@@ -811,25 +844,53 @@ function broadcastGameState(gameId) {
 
         // Check if this player is a bot
         if (player && player.isBot && player.botInstance) {
-            // Notify the bot of the game state
+            // Notify the bot of the game state (no serialization needed)
             player.botInstance.onGameState(state);
-        } else {
-            sendToPlayer(pId, {
-                type: 'game_state',
-                state
-            });
+        } else if (player && player.ws.readyState === WebSocket.OPEN) {
+            // Performance: Direct send with pre-built message
+            try {
+                player.ws.send(JSON.stringify({ ...baseMessage, state }));
+            } catch (e) {
+                console.error('Error sending game state:', e.message);
+            }
         }
     });
 }
 
+// Performance: Throttle lobby list broadcasts
+let lobbyBroadcastPending = false;
+let lastLobbyBroadcast = 0;
+const LOBBY_BROADCAST_THROTTLE = 100; // Max 10 broadcasts per second
+
 function broadcastLobbyList() {
+    const now = Date.now();
+
+    // Throttle broadcasts
+    if (now - lastLobbyBroadcast < LOBBY_BROADCAST_THROTTLE) {
+        if (!lobbyBroadcastPending) {
+            lobbyBroadcastPending = true;
+            setTimeout(() => {
+                lobbyBroadcastPending = false;
+                broadcastLobbyList();
+            }, LOBBY_BROADCAST_THROTTLE);
+        }
+        return;
+    }
+
+    lastLobbyBroadcast = now;
     const lobbies = lobbyManager.getOpenLobbies();
+
+    // Pre-serialize once for all recipients
+    const message = JSON.stringify({ type: 'lobby_list', lobbies });
+
     players.forEach((player, playerId) => {
-        if (player.ws.readyState === WebSocket.OPEN) {
-            player.ws.send(JSON.stringify({
-                type: 'lobby_list',
-                lobbies
-            }));
+        if (player.ws.readyState === WebSocket.OPEN && !player.gameId) {
+            // Only send to players not in a game
+            try {
+                player.ws.send(message);
+            } catch (e) {
+                // Ignore send errors
+            }
         }
     });
 }

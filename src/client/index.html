@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a1628">
     <title>Strategic Card Game</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/builder.css">
@@ -100,15 +104,16 @@
                     <li>Attack with your units, then end your turn</li>
                 </ul>
 
-                <h3>Mana Lands</h3>
+                <h3>Fortifications (Mana Lands)</h3>
                 <ul>
                     <li>Base mana grows each turn: 1 → 2 → ... → 10 (cap)</li>
-                    <li>Each player has a pool of 7 lands (separate from deck)</li>
-                    <li>Play lands anytime from your pool for 1 mana</li>
-                    <li>Each land on the field adds +1 to your max mana</li>
-                    <li>Max mana = Base mana + Lands on field (up to 17)</li>
-                    <li>Lands have 5 health and can be attacked!</li>
-                    <li>Destroying enemy lands reduces their mana income</li>
+                    <li>Each player has 7 fortifications to build (separate from deck)</li>
+                    <li>Build fortifications for <strong>5 mana</strong> each</li>
+                    <li>Each fortification adds +1 to your max mana</li>
+                    <li>Max 7 fortifications on the battlefield at once</li>
+                    <li>Fortifications have 5 health and can be attacked!</li>
+                    <li>Destroyed fortifications return to your pool to rebuild</li>
+                    <li>Destroy enemy fortifications to reduce their mana income</li>
                 </ul>
 
                 <h3>Unit Traits</h3>
@@ -146,100 +151,145 @@
 
         <!-- Game Screen -->
         <div id="game-screen" class="screen">
-            <!-- Opponent Section (Top) -->
-            <div class="game-opponent-section">
-                <!-- Opponent Info Bar -->
-                <div class="player-bar opponent-bar">
-                    <div class="player-portrait opponent-portrait" id="opponent-hero-target">
-                        <div class="portrait-health">
-                            <span id="opponent-health">30</span>
+            <!-- Game Board Background -->
+            <div class="game-board">
+                <!-- Opponent Side -->
+                <div class="game-side opponent-side">
+                    <!-- Opponent Hero Frame - Centered Layout -->
+                    <div class="hero-frame opponent-hero-frame opponent-centered">
+                        <div class="hero-info opponent-name-only">
+                            <span class="hero-name" id="opponent-name-display">Opponent</span>
                         </div>
-                        <div class="portrait-name" id="opponent-name-display">Opponent</div>
+                        <div class="opponent-stats-centered">
+                            <div class="opponent-stat-box mana-box">
+                                <span class="stat-icon">&#9670;</span>
+                                <span class="stat-value" id="opponent-mana">1/1</span>
+                                <span class="stat-label">MANA</span>
+                            </div>
+                            <div class="opponent-stat-box deck-box">
+                                <span class="stat-icon">&#9639;</span>
+                                <span class="stat-value" id="opponent-deck">20</span>
+                                <span class="stat-label">DECK</span>
+                            </div>
+                            <div class="opponent-stat-box hand-box">
+                                <span class="stat-icon">&#9643;</span>
+                                <span class="stat-value" id="opponent-hand-count">4</span>
+                                <span class="stat-label">HAND</span>
+                            </div>
+                        </div>
+                        <div class="hero-portrait opponent-hero-portrait" id="opponent-hero-target">
+                            <div class="hero-portrait-inner">
+                                <span class="hero-icon">&#9876;</span>
+                            </div>
+                            <div class="hero-health-orb">
+                                <span id="opponent-health">30</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="player-stats">
-                        <div class="stat mana-stat">
-                            <span class="stat-icon">&#9670;</span>
-                            <span id="opponent-mana">1/1</span>
-                        </div>
-                        <div class="stat deck-stat">
-                            <span class="stat-icon">&#9639;</span>
-                            <span id="opponent-deck">20</span>
-                        </div>
-                        <div class="stat hand-stat">
-                            <span class="stat-icon">&#9643;</span>
-                            <span id="opponent-hand-count">4</span> cards
-                        </div>
+
+                    <!-- Opponent Lands Row -->
+                    <div class="lands-row opponent-lands-row">
+                        <div id="opponent-lands" class="lands-container"></div>
                     </div>
-                </div>
 
-                <!-- Opponent Lands -->
-                <div class="lands-zone opponent-lands-zone">
-                    <div id="opponent-lands" class="lands-container"></div>
-                </div>
-
-                <!-- Opponent Field -->
-                <div class="battlefield-zone opponent-zone">
-                    <div id="opponent-field" class="units-container"></div>
-                </div>
-            </div>
-
-            <!-- Center Divider / Turn Info -->
-            <div class="game-center-divider">
-                <div class="turn-indicator-container" id="turn-indicator-container">
-                    <div id="turn-indicator" class="turn-badge">
-                        <span id="turn-text">Your Turn</span>
+                    <!-- Opponent Mana Crystal Bar -->
+                    <div class="mana-crystal-bar opponent-mana-bar">
+                        <div id="opponent-mana-crystals" class="mana-crystals"></div>
                     </div>
-                    <span id="turn-number" class="turn-number">Turn 1</span>
-                </div>
-                <button id="end-turn-btn" class="btn btn-end-turn">End Turn</button>
-            </div>
 
-            <!-- Player Section (Bottom) -->
-            <div class="game-player-section">
-                <!-- Player Field -->
-                <div class="battlefield-zone player-zone">
-                    <div id="player-field" class="units-container"></div>
-                </div>
-
-                <!-- Player Lands -->
-                <div class="lands-zone player-lands-zone">
-                    <div id="player-lands" class="lands-container"></div>
-                    <button id="play-land-btn" class="btn btn-land-small" title="Play a Mana Land (Cost: 1)">+ Land</button>
-                </div>
-
-                <!-- Player Info Bar -->
-                <div class="player-bar player-bar-bottom">
-                    <div class="player-portrait player-portrait-self" id="player-hero">
-                        <div class="portrait-health">
-                            <span id="player-health">30</span>
-                        </div>
-                        <div class="portrait-name" id="player-name-display">You</div>
-                    </div>
-                    <div class="player-stats">
-                        <div class="stat mana-stat">
-                            <span class="stat-icon">&#9670;</span>
-                            <span id="player-mana">1/1</span>
-                        </div>
-                        <div class="stat deck-stat">
-                            <span class="stat-icon">&#9639;</span>
-                            <span id="player-deck">20</span>
-                        </div>
-                        <div class="stat lands-stat">
-                            <span class="stat-icon">&#9632;</span>
-                            <span id="player-lands-count">7</span> lands
+                    <!-- Opponent Battlefield -->
+                    <div class="battlefield opponent-battlefield">
+                        <div class="battlefield-inner">
+                            <div id="opponent-field" class="units-container"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Player Hand -->
-                <div class="hand-zone">
-                    <div id="player-hand" class="hand-container"></div>
+                <!-- Center Arena -->
+                <div class="arena-center">
+                    <div class="arena-divider"></div>
+                    <div class="turn-display">
+                        <div id="turn-indicator" class="turn-gem">
+                            <span id="turn-text">Your Turn</span>
+                        </div>
+                        <span id="turn-number" class="turn-counter">Turn 1</span>
+                    </div>
+                    <button id="end-turn-btn" class="end-turn-button">
+                        <span class="btn-text">End Turn</span>
+                        <span class="btn-glow"></span>
+                    </button>
+                </div>
+
+                <!-- Player Side -->
+                <div class="game-side player-side">
+                    <!-- Player Battlefield -->
+                    <div class="battlefield player-battlefield">
+                        <div class="battlefield-inner">
+                            <div id="player-field" class="units-container"></div>
+                        </div>
+                    </div>
+
+                    <!-- Player Lands Row -->
+                    <div class="lands-row player-lands-row">
+                        <div id="player-lands" class="lands-container"></div>
+                        <button id="play-land-btn" class="land-button" title="Build a Fortification (Cost: 5 mana)">
+                            <span class="land-btn-icon">🏰</span>
+                            <span class="land-btn-text">Build</span>
+                        </button>
+                    </div>
+
+                    <!-- Player Mana Crystal Bar -->
+                    <div class="mana-crystal-bar player-mana-bar">
+                        <div id="player-mana-crystals" class="mana-crystals"></div>
+                    </div>
+
+                    <!-- Player Hero Frame - Centered Layout -->
+                    <div class="hero-frame player-hero-frame player-centered">
+                        <div class="hero-portrait player-hero-portrait" id="player-hero">
+                            <div class="hero-portrait-inner">
+                                <span class="hero-icon">&#9876;</span>
+                            </div>
+                            <div class="hero-health-orb player-health-orb">
+                                <span id="player-health">30</span>
+                            </div>
+                        </div>
+                        <div class="player-stats-centered">
+                            <div class="player-stat-box mana-box">
+                                <span class="stat-icon">&#9670;</span>
+                                <span class="stat-value" id="player-mana">1/1</span>
+                                <span class="stat-label">MANA</span>
+                            </div>
+                            <div class="player-stat-box deck-box">
+                                <span class="stat-icon">&#9639;</span>
+                                <span class="stat-value" id="player-deck">20</span>
+                                <span class="stat-label">DECK</span>
+                            </div>
+                            <div class="player-stat-box lands-box">
+                                <span class="stat-icon">&#9632;</span>
+                                <span class="stat-value" id="player-lands-count">7</span>
+                                <span class="stat-label">LANDS</span>
+                            </div>
+                        </div>
+                        <div class="hero-info player-name-only">
+                            <span class="hero-name" id="player-name-display">You</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Hand Tray -->
+                <div class="hand-tray">
+                    <div class="hand-tray-inner">
+                        <div id="player-hand" class="hand-container"></div>
+                    </div>
                 </div>
             </div>
 
             <!-- Event Log (Side Panel) -->
             <div id="event-log-panel" class="event-log-panel">
-                <div class="event-log-header">Battle Log</div>
+                <div class="event-log-header">
+                    <span class="log-icon">&#9881;</span>
+                    Battle Log
+                </div>
                 <div id="event-log" class="event-log-content"></div>
             </div>
 

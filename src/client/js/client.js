@@ -252,6 +252,12 @@ class GameClient {
         element.addEventListener('mouseleave', () => {
             this.hideTooltip();
         });
+
+        // Touch support: hide tooltip on touch elsewhere
+        element.addEventListener('touchstart', (e) => {
+            // Don't show tooltips on touch - just let the click/tap happen
+            this.hideTooltip();
+        }, { passive: true });
     }
 
     async loadDecks() {
@@ -291,10 +297,22 @@ class GameClient {
             select.appendChild(option);
         });
 
-        select.addEventListener('change', () => {
+        // Handle deck selection - use both 'change' and 'input' for better mobile support
+        // Remove old listeners first to prevent duplicates
+        const handleDeckChange = () => {
             this.selectedDeckId = select.value || null;
             if (createBtn) createBtn.disabled = !this.selectedDeckId;
-        });
+        };
+
+        // Store reference to remove old listener if exists
+        if (this._deckChangeHandler) {
+            select.removeEventListener('change', this._deckChangeHandler);
+            select.removeEventListener('input', this._deckChangeHandler);
+        }
+        this._deckChangeHandler = handleDeckChange;
+
+        select.addEventListener('change', handleDeckChange);
+        select.addEventListener('input', handleDeckChange); // Better mobile support
     }
 
     // ===== WebSocket Connection =====
@@ -520,6 +538,23 @@ class GameClient {
         }
     }
 
+    // Helper to bind both click and touch events for mobile support
+    bindButtonEvent(button, handler) {
+        if (!button) return;
+
+        // Use click for desktop and most mobile browsers
+        button.onclick = (e) => {
+            e.preventDefault();
+            handler();
+        };
+
+        // Add touchend for better mobile responsiveness
+        button.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            handler();
+        }, { passive: false });
+    }
+
     bindEvents() {
         // Menu buttons
         const createLobbyBtn = document.getElementById('create-lobby-btn');
@@ -528,29 +563,29 @@ class GameClient {
         const backToMenuBtn = document.getElementById('back-to-menu-btn');
         const playAgainBtn = document.getElementById('play-again-btn');
 
-        if (createLobbyBtn) createLobbyBtn.onclick = () => this.createLobby();
-        if (refreshBtn) refreshBtn.onclick = () => this.refreshLobbies();
-        if (howToPlayBtn) howToPlayBtn.onclick = () => this.showScreen('rules-screen');
-        if (backToMenuBtn) backToMenuBtn.onclick = () => this.showScreen('menu-screen');
-        if (playAgainBtn) playAgainBtn.onclick = () => this.backToMenu();
+        this.bindButtonEvent(createLobbyBtn, () => this.createLobby());
+        this.bindButtonEvent(refreshBtn, () => this.refreshLobbies());
+        this.bindButtonEvent(howToPlayBtn, () => this.showScreen('rules-screen'));
+        this.bindButtonEvent(backToMenuBtn, () => this.showScreen('menu-screen'));
+        this.bindButtonEvent(playAgainBtn, () => this.backToMenu());
 
         // Lobby buttons
         const leaveLobbyBtn = document.getElementById('leave-lobby-btn');
         const startGameBtn = document.getElementById('start-game-btn');
         const addBotBtn = document.getElementById('add-bot-btn');
 
-        if (leaveLobbyBtn) leaveLobbyBtn.onclick = () => this.leaveLobby();
-        if (startGameBtn) startGameBtn.onclick = () => this.startGame();
-        if (addBotBtn) addBotBtn.onclick = () => this.addBot();
+        this.bindButtonEvent(leaveLobbyBtn, () => this.leaveLobby());
+        this.bindButtonEvent(startGameBtn, () => this.startGame());
+        this.bindButtonEvent(addBotBtn, () => this.addBot());
 
         // Game buttons
         const endTurnBtn = document.getElementById('end-turn-btn');
         const cancelTargetBtn = document.getElementById('cancel-target-btn');
         const playLandBtn = document.getElementById('play-land-btn');
 
-        if (endTurnBtn) endTurnBtn.onclick = () => this.endTurn();
-        if (cancelTargetBtn) cancelTargetBtn.onclick = () => this.cancelTargeting();
-        if (playLandBtn) playLandBtn.onclick = () => this.playLand();
+        this.bindButtonEvent(endTurnBtn, () => this.endTurn());
+        this.bindButtonEvent(cancelTargetBtn, () => this.cancelTargeting());
+        this.bindButtonEvent(playLandBtn, () => this.playLand());
 
         // Cancel targeting when pressing Escape
         document.addEventListener('keydown', (e) => {
@@ -625,7 +660,8 @@ class GameClient {
                 <button class="btn btn-primary join-btn">Join</button>
             `;
 
-            el.querySelector('.join-btn').onclick = () => this.joinLobby(lobby.id);
+            const joinBtn = el.querySelector('.join-btn');
+            this.bindButtonEvent(joinBtn, () => this.joinLobby(lobby.id));
             container.appendChild(el);
         });
     }
@@ -988,15 +1024,20 @@ class GameClient {
         // Update buttons
         document.getElementById('end-turn-btn').disabled = !state.isYourTurn;
 
-        // Update play land button - now based on land pool
-        const landCost = state.landCost || 1;
+        // Update build fortification button - now based on land pool
+        const landCost = state.landCost || 5;
         const landPool = state.you.landPool || 0;
+        const landsOnField = state.you.lands?.length || 0;
+        const maxLands = 7;
         const playLandBtn = document.getElementById('play-land-btn');
-        playLandBtn.disabled = !state.isYourTurn || state.you.currentMana < landCost || landPool === 0;
-        playLandBtn.textContent = `+ Land (${landPool})`;
+        playLandBtn.disabled = !state.isYourTurn ||
+            state.you.currentMana < landCost ||
+            landPool === 0 ||
+            landsOnField >= maxLands;
+        playLandBtn.innerHTML = `<span class="land-btn-icon">🏰</span><span class="land-btn-text">Build (${landPool})</span>`;
         playLandBtn.title = landPool > 0
-            ? `Play a Mana Land (Cost: ${landCost}) - ${landPool} available`
-            : 'No lands remaining';
+            ? `Build Fortification (Cost: ${landCost} mana) - ${landPool} available, ${landsOnField}/${maxLands} on field`
+            : 'All fortifications deployed or destroyed';
 
         // Render game elements
         // If in card selection phase, use selection render
@@ -1012,6 +1053,13 @@ class GameClient {
         this.renderField('opponent-field', state.opponent.field, false);
         this.renderLands('player-lands', state.you.lands || [], true);
         this.renderLands('opponent-lands', state.opponent.lands || [], false);
+
+        // Render mana crystals
+        const playerLandsCount = state.you.lands?.length || 0;
+        const opponentLandsCount = state.opponent.lands?.length || 0;
+        this.renderManaCrystals('player-mana-crystals', state.you.currentMana, state.you.maxMana, playerLandsCount);
+        this.renderManaCrystals('opponent-mana-crystals', state.opponent.currentMana, state.opponent.maxMana, opponentLandsCount);
+
         this.renderEventLog(state.events || []);
 
         // Setup opponent hero target
@@ -1044,9 +1092,9 @@ class GameClient {
             `;
             document.getElementById('game-screen').appendChild(overlay);
 
-            // Bind button events
-            document.getElementById('confirm-selection-btn').onclick = () => this.confirmCardSelection();
-            document.getElementById('skip-selection-btn').onclick = () => this.skipCardSelection();
+            // Bind button events with touch support
+            this.bindButtonEvent(document.getElementById('confirm-selection-btn'), () => this.confirmCardSelection());
+            this.bindButtonEvent(document.getElementById('skip-selection-btn'), () => this.skipCardSelection());
         }
         overlay.classList.remove('hidden');
         this.updateSelectionCount();
@@ -1145,24 +1193,51 @@ class GameClient {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
 
-        lands.forEach(land => {
-            const landEl = this.createLandElement(land, isPlayer);
-            // Attach tooltip to lands
-            this.attachTooltipEvents(landEl, { ...land, type: 'land', name: 'Mana Land', cost: 1 });
+        // Fortification building names for each tower
+        const towerNames = ['Watchtower', 'Bastion', 'Citadel', 'Fortress', 'Stronghold', 'Keep', 'Sanctum'];
+
+        lands.forEach((land, index) => {
+            const landEl = this.createLandElement(land, isPlayer, index, lands.length);
+            // Attach tooltip to lands with tower name
+            const towerName = towerNames[index] || 'Mana Tower';
+            this.attachTooltipEvents(landEl, {
+                ...land,
+                type: 'land',
+                name: towerName,
+                cost: this.gameState?.landCost || 5,
+                description: `Generates +1 max mana. Destroying enemy fortifications reduces their mana income.`
+            });
             container.appendChild(landEl);
         });
     }
 
-    createLandElement(land, isPlayer) {
+    createLandElement(land, isPlayer, index = 0, totalLands = 1) {
         const el = document.createElement('div');
         el.className = 'land-card';
         el.dataset.instanceId = land.instanceId;
 
-        const healthClass = land.currentHealth < land.health ? 'damaged' : '';
+        // Add tier class based on position (later lands are bigger fortifications)
+        const tier = Math.min(index, 2); // tier 0, 1, or 2
+        el.classList.add(`land-tier-${tier}`);
 
+        const healthClass = land.currentHealth < land.health ? 'damaged' : '';
+        const healthPercent = (land.currentHealth / land.health) * 100;
+
+        // Tower icons based on tier (increasingly impressive fortifications)
+        const towerIcons = ['🗼', '🏰', '⛫'];
+        const towerIcon = towerIcons[tier] || '🏰';
+
+        // Create visual structure layers
         el.innerHTML = `
-            <div class="land-icon">&#9632;</div>
-            <div class="land-health ${healthClass}">${land.currentHealth}</div>
+            <div class="land-structure">
+                <div class="land-base"></div>
+                <div class="land-tower">${towerIcon}</div>
+                <div class="land-glow"></div>
+            </div>
+            <div class="land-health-bar">
+                <div class="land-health-fill" style="width: ${healthPercent}%"></div>
+            </div>
+            <div class="land-health-text ${healthClass}">${land.currentHealth}</div>
         `;
 
         // Enemy lands can be targeted when in attack mode
@@ -1182,6 +1257,35 @@ class GameClient {
         }
 
         return el;
+    }
+
+    renderManaCrystals(containerId, currentMana, maxMana, landsCount) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        // Calculate base mana (maxMana - lands bonus)
+        const baseMana = maxMana - landsCount;
+
+        // Create crystals for base mana first, then land mana
+        for (let i = 0; i < maxMana; i++) {
+            const crystal = document.createElement('div');
+            crystal.className = 'mana-crystal';
+
+            // Determine if this is a base crystal or land crystal
+            const isLandCrystal = i >= baseMana;
+            crystal.classList.add(isLandCrystal ? 'land' : 'base');
+
+            // Determine if filled or empty
+            const isFilled = i < currentMana;
+            crystal.classList.add(isFilled ? 'filled' : 'empty');
+
+            // Add inner glow element
+            crystal.innerHTML = '<span class="crystal-glow"></span>';
+
+            container.appendChild(crystal);
+        }
     }
 
     createCardElement(card, inHand = false) {
@@ -1212,6 +1316,11 @@ class GameClient {
             // Get traits/abilities
             const traits = card.traits || card.abilities || [];
 
+            // Add trait classes for visual effects
+            traits.forEach(trait => {
+                el.classList.add(`trait-${trait}`);
+            });
+
             el.innerHTML = `
                 <div class="card-cost">${manaCost}</div>
                 <div class="card-name">${card.name}</div>
@@ -1235,7 +1344,14 @@ class GameClient {
         el.className = 'card field-unit';
         el.dataset.instanceId = unit.instanceId;
 
-        // Add visual indicator for stealthed units
+        const traits = unit.traits || unit.abilities || [];
+
+        // Add trait classes for visual effects
+        traits.forEach(trait => {
+            el.classList.add(`trait-${trait}`);
+        });
+
+        // Add visual indicator for stealthed units (active stealth)
         if (unit.hasStealthActive) {
             el.classList.add('stealthed');
         }
@@ -1273,7 +1389,6 @@ class GameClient {
         }
 
         const healthClass = unit.currentHealth < unit.health ? 'damaged' : '';
-        const traits = unit.traits || unit.abilities || [];
 
         el.innerHTML = `
             <div class="card-name">${unit.name}</div>
@@ -1406,7 +1521,7 @@ class GameClient {
     }
 
     // ===== Attack Animations =====
-    animateAttack(attackerEl, targetEl, damage, onComplete) {
+    animateAttack(attackerEl, targetEl, damage, onComplete, isOpponentTarget = false) {
         if (!attackerEl || !targetEl) {
             if (onComplete) onComplete();
             return;
@@ -1439,7 +1554,7 @@ class GameClient {
         // On impact
         setTimeout(() => {
             // Show damage number on target
-            this.showDamageNumber(targetEl, damage);
+            this.showDamageNumber(targetEl, damage, isOpponentTarget);
 
             // Add shake effect to target
             targetEl.classList.add('hit-shake');
@@ -1457,7 +1572,7 @@ class GameClient {
         }, 250);
     }
 
-    showDamageNumber(targetEl, damage) {
+    showDamageNumber(targetEl, damage, isOpponentTarget = false) {
         if (!targetEl || damage === undefined) return;
 
         const rect = targetEl.getBoundingClientRect();
@@ -1469,10 +1584,16 @@ class GameClient {
             popup.classList.add('heal');
         }
 
-        // Position above the target with slight random offset for visual variety
+        // For opponent targets, float damage downward (toward center of screen)
+        if (isOpponentTarget) {
+            popup.classList.add('opponent-damage');
+        }
+
+        // Position on the target with slight random offset for visual variety
         const offsetX = (Math.random() - 0.5) * 20;
         popup.style.left = `${rect.left + rect.width / 2 + offsetX}px`;
-        popup.style.top = `${rect.top + rect.height * 0.3}px`;
+        // Position at center of target for better visibility
+        popup.style.top = `${rect.top + rect.height / 2}px`;
 
         document.body.appendChild(popup);
 
@@ -1492,26 +1613,33 @@ class GameClient {
         const attackerEl = document.querySelector(`[data-instance-id="${event.attackerId}"]`);
         console.log('[Animation] Attacker element:', attackerEl);
 
-        // Find target element based on type
+        // Find target element based on type and determine if it's an opponent target
         let targetEl = null;
+        let isOpponentTarget = false;
+
         if (event.targetType === 'hero') {
-            targetEl = event.targetPlayerId === this.gameState.opponent.id
+            isOpponentTarget = event.targetPlayerId === this.gameState.opponent.id;
+            targetEl = isOpponentTarget
                 ? document.getElementById('opponent-hero-target')
                 : document.getElementById('player-hero');
         } else if (event.targetType === 'unit') {
             targetEl = document.querySelector(`[data-instance-id="${event.targetId}"]`);
+            // Check if unit is in opponent field
+            isOpponentTarget = targetEl && targetEl.closest('#opponent-field') !== null;
         } else if (event.targetType === 'land') {
             targetEl = document.querySelector(`#opponent-lands [data-instance-id="${event.targetId}"], #player-lands [data-instance-id="${event.targetId}"]`);
+            // Check if land is in opponent lands
+            isOpponentTarget = targetEl && targetEl.closest('#opponent-lands') !== null;
         }
-        console.log('[Animation] Target element:', targetEl);
+        console.log('[Animation] Target element:', targetEl, 'isOpponent:', isOpponentTarget);
 
         if (attackerEl && targetEl) {
-            this.animateAttack(attackerEl, targetEl, event.damage);
+            this.animateAttack(attackerEl, targetEl, event.damage, null, isOpponentTarget);
         } else {
             console.log('[Animation] Missing element - attacker:', !!attackerEl, 'target:', !!targetEl);
             // Still show damage number on target if we have it
             if (targetEl) {
-                this.showDamageNumber(targetEl, event.damage);
+                this.showDamageNumber(targetEl, event.damage, isOpponentTarget);
             }
         }
     }
@@ -1527,22 +1655,30 @@ class GameClient {
 
         const attackerEl = document.querySelector(`[data-instance-id="${event.attackerId}"]`);
         let targetEl = null;
+        let isOpponentTarget = false;
+
         if (event.targetType === 'hero') {
-            targetEl = event.targetPlayerId === this.gameState.opponent.id
+            isOpponentTarget = event.targetPlayerId === this.gameState.opponent.id;
+            targetEl = isOpponentTarget
                 ? document.getElementById('opponent-hero-target')
                 : document.getElementById('player-hero');
         } else if (event.targetType === 'unit') {
             targetEl = document.querySelector(`[data-instance-id="${event.targetId}"]`);
+            isOpponentTarget = targetEl && targetEl.closest('#opponent-field') !== null;
         } else if (event.targetType === 'land') {
             targetEl = document.querySelector(`#opponent-lands [data-instance-id="${event.targetId}"], #player-lands [data-instance-id="${event.targetId}"]`);
+            isOpponentTarget = targetEl && targetEl.closest('#opponent-lands') !== null;
         }
+
+        // Check if attacker is an opponent (for counter-damage display)
+        const isAttackerOpponent = attackerEl && attackerEl.closest('#opponent-field') !== null;
 
         if (attackerEl && targetEl) {
             // Animation with callback for deaths
             this.animateAttack(attackerEl, targetEl, event.damage, () => {
                 // Show counter damage if applicable
                 if (event.counterDamage && event.counterDamage > 0) {
-                    this.showDamageNumber(attackerEl, event.counterDamage);
+                    this.showDamageNumber(attackerEl, event.counterDamage, isAttackerOpponent);
                     attackerEl.classList.add('hit-shake');
                     setTimeout(() => attackerEl.classList.remove('hit-shake'), 300);
                 }
@@ -1555,10 +1691,10 @@ class GameClient {
                         if (onComplete) onComplete();
                     }
                 }, 200);
-            });
+            }, isOpponentTarget);
         } else {
             // No animation possible, just complete
-            if (targetEl) this.showDamageNumber(targetEl, event.damage);
+            if (targetEl) this.showDamageNumber(targetEl, event.damage, isOpponentTarget);
             if (event.deaths && event.deaths.length > 0) {
                 this.playDeathAnimations(event.deaths, onComplete);
             } else {

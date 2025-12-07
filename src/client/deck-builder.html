@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a1628">
     <title>Deck Builder - Strategic Card Game</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/builder.css">
@@ -25,14 +29,253 @@
 
         <!-- Main Builder Area -->
         <div class="deck-builder-main">
-            <!-- Left: Card Collection + Saved Decks -->
-            <div class="deck-builder-left">
+            <!-- Left: Deck Wizard -->
+            <div class="panel deck-wizard-panel" id="panel-deck-wizard">
+                <div class="panel-header">
+                    <h2>Deck Wizard</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="toggleDeckWizard()">
+                        <span id="deck-wizard-toggle-text">Hide</span>
+                    </button>
+                </div>
+                <div id="deck-wizard-content" class="wizard-content">
+                    <p class="wizard-intro">Build a balanced deck from your cards!</p>
+
+                    <!-- Card Count Warning -->
+                    <div id="wizard-card-warning" class="wizard-warning hidden">
+                        <span class="warning-icon">⚠️</span>
+                        <span class="warning-text">You need at least 25 cards to build a deck. Create more cards first!</span>
+                    </div>
+
+                    <!-- Step 1: Archetype -->
+                    <div class="wizard-step" data-step="1">
+                        <div class="wizard-step-header">
+                            <span class="step-number">1</span>
+                            <span class="step-title">What archetype do you want?</span>
+                        </div>
+                        <div class="wizard-options" id="deck-wizard-archetype">
+                            <button class="wizard-option" data-value="aggro" onclick="selectDeckWizardOption('archetype', 'aggro', this)">
+                                <span class="option-icon">⚡</span>
+                                <span class="option-label">Aggro</span>
+                                <span class="option-desc">Fast, low-cost, rush down</span>
+                            </button>
+                            <button class="wizard-option" data-value="midrange" onclick="selectDeckWizardOption('archetype', 'midrange', this)">
+                                <span class="option-icon">⚖️</span>
+                                <span class="option-label">Midrange</span>
+                                <span class="option-desc">Balanced, flexible curve</span>
+                            </button>
+                            <button class="wizard-option" data-value="control" onclick="selectDeckWizardOption('archetype', 'control', this)">
+                                <span class="option-icon">🏰</span>
+                                <span class="option-label">Control</span>
+                                <span class="option-desc">Defensive, late-game power</span>
+                            </button>
+                            <button class="wizard-option" data-value="combo" onclick="selectDeckWizardOption('archetype', 'combo', this)">
+                                <span class="option-icon">✨</span>
+                                <span class="option-label">Synergy</span>
+                                <span class="option-desc">Trait synergies, combos</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Focus -->
+                    <div class="wizard-step" data-step="2">
+                        <div class="wizard-step-header">
+                            <span class="step-number">2</span>
+                            <span class="step-title">What's your primary focus?</span>
+                        </div>
+                        <div class="wizard-options" id="deck-wizard-focus">
+                            <button class="wizard-option" data-value="damage" onclick="selectDeckWizardOption('focus', 'damage', this)">
+                                <span class="option-icon">⚔️</span>
+                                <span class="option-label">Damage</span>
+                                <span class="option-desc">High attack units</span>
+                            </button>
+                            <button class="wizard-option" data-value="survival" onclick="selectDeckWizardOption('focus', 'survival', this)">
+                                <span class="option-icon">🛡️</span>
+                                <span class="option-label">Survival</span>
+                                <span class="option-desc">High health, sustain</span>
+                            </button>
+                            <button class="wizard-option" data-value="tempo" onclick="selectDeckWizardOption('focus', 'tempo', this)">
+                                <span class="option-icon">🔥</span>
+                                <span class="option-label">Tempo</span>
+                                <span class="option-desc">Swift, immediate impact</span>
+                            </button>
+                            <button class="wizard-option" data-value="value" onclick="selectDeckWizardOption('focus', 'value', this)">
+                                <span class="option-icon">💎</span>
+                                <span class="option-label">Value</span>
+                                <span class="option-desc">Efficient stat ratios</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Risk Level -->
+                    <div class="wizard-step" data-step="3">
+                        <div class="wizard-step-header">
+                            <span class="step-number">3</span>
+                            <span class="step-title">Risk tolerance?</span>
+                        </div>
+                        <div class="wizard-options" id="deck-wizard-risk">
+                            <button class="wizard-option" data-value="safe" onclick="selectDeckWizardOption('risk', 'safe', this)">
+                                <span class="option-icon">🔒</span>
+                                <span class="option-label">Safe</span>
+                                <span class="option-desc">No negative traits</span>
+                            </button>
+                            <button class="wizard-option" data-value="moderate" onclick="selectDeckWizardOption('risk', 'moderate', this)">
+                                <span class="option-icon">🎲</span>
+                                <span class="option-label">Moderate</span>
+                                <span class="option-desc">Some risks for power</span>
+                            </button>
+                            <button class="wizard-option" data-value="risky" onclick="selectDeckWizardOption('risk', 'risky', this)">
+                                <span class="option-icon">💀</span>
+                                <span class="option-label">High Risk</span>
+                                <span class="option-desc">Include risky cards</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Trait Preference -->
+                    <div class="wizard-step" data-step="4">
+                        <div class="wizard-step-header">
+                            <span class="step-number">4</span>
+                            <span class="step-title">Preferred traits? (optional)</span>
+                        </div>
+                        <div class="trait-checkboxes" id="deck-wizard-traits">
+                            <!-- Will be populated by JS based on available cards -->
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <div class="wizard-actions">
+                        <button class="btn btn-primary btn-lg" onclick="generateDeckFromWizard()" id="deck-wizard-generate-btn" disabled>
+                            🎴 Generate Deck
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetDeckWizard()">
+                            Reset Choices
+                        </button>
+                    </div>
+
+                    <!-- Wizard Summary -->
+                    <div id="deck-wizard-summary" class="wizard-summary hidden">
+                        <h4>Your Strategy:</h4>
+                        <div id="deck-wizard-summary-content"></div>
+                    </div>
+
+                    <!-- Analysis Preview -->
+                    <div id="deck-wizard-analysis" class="wizard-analysis hidden">
+                        <h4>Card Pool Analysis:</h4>
+                        <div id="deck-wizard-analysis-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center: Card Collection + Saved Decks -->
+            <div class="deck-builder-center">
                 <!-- Card Collection -->
                 <div class="panel" id="panel-collection">
                     <div class="panel-header">
                         <h2>My Cards</h2>
                         <span id="collection-count">0 cards</span>
+                        <button class="btn btn-sm btn-secondary" onclick="toggleFilters()" id="toggle-filters-btn">
+                            Filters
+                        </button>
                     </div>
+
+                    <!-- Filter Panel -->
+                    <div id="filter-panel" class="filter-panel hidden">
+                        <!-- Search -->
+                        <div class="filter-row">
+                            <input type="text" id="filter-search" class="filter-input" placeholder="Search by name...">
+                        </div>
+
+                        <!-- Stat Filters -->
+                        <div class="filter-row filter-stats">
+                            <div class="filter-stat">
+                                <label>Mana</label>
+                                <select id="filter-mana">
+                                    <option value="">Any</option>
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6+">6+</option>
+                                </select>
+                            </div>
+                            <div class="filter-stat">
+                                <label>Attack</label>
+                                <select id="filter-attack">
+                                    <option value="">Any</option>
+                                    <option value="0-2">0-2</option>
+                                    <option value="3-5">3-5</option>
+                                    <option value="6+">6+</option>
+                                </select>
+                            </div>
+                            <div class="filter-stat">
+                                <label>Health</label>
+                                <select id="filter-health">
+                                    <option value="">Any</option>
+                                    <option value="1-3">1-3</option>
+                                    <option value="4-6">4-6</option>
+                                    <option value="7+">7+</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Trait Filter -->
+                        <div class="filter-row">
+                            <label>Traits</label>
+                            <select id="filter-trait">
+                                <option value="">Any trait</option>
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+
+                        <!-- Deck Membership Filter -->
+                        <div class="filter-row">
+                            <label>In Deck</label>
+                            <select id="filter-in-deck">
+                                <option value="">All cards</option>
+                                <option value="not-in-deck">Not in current deck</option>
+                                <option value="in-deck">In current deck</option>
+                                <option value="can-add">Can add more copies</option>
+                            </select>
+                        </div>
+
+                        <!-- Tag Filter -->
+                        <div class="filter-row">
+                            <label>Tags</label>
+                            <select id="filter-tag">
+                                <option value="">Any tag</option>
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+
+                        <!-- Sort -->
+                        <div class="filter-row">
+                            <label>Sort by</label>
+                            <select id="filter-sort">
+                                <option value="name">Name</option>
+                                <option value="mana">Mana Cost</option>
+                                <option value="attack">Attack</option>
+                                <option value="health">Health</option>
+                                <option value="recent">Recently Created</option>
+                            </select>
+                        </div>
+
+                        <!-- Filter Actions -->
+                        <div class="filter-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="clearFilters()">Clear All</button>
+                        </div>
+                    </div>
+
+                    <!-- Replacement Mode Banner -->
+                    <div id="replacement-mode-banner" class="replacement-banner hidden">
+                        <div class="replacement-info">
+                            <span class="replacement-label">Replacing:</span>
+                            <span id="replacement-card-name" class="replacement-card-name"></span>
+                        </div>
+                        <button class="btn btn-sm btn-secondary" onclick="exitReplacementMode()">Cancel</button>
+                    </div>
+
                     <div class="panel-content">
                         <div id="card-collection" class="cards-grid"></div>
                     </div>
@@ -82,6 +325,37 @@
                     + 7 Mana Lands added automatically at game start
                 </p>
 
+                <!-- Deck Balance Pentagon -->
+                <div class="deck-balance-section">
+                    <div class="deck-balance-header">
+                        <span class="balance-title">Deck Balance</span>
+                        <button class="btn btn-sm btn-secondary" onclick="toggleBalanceChart()" id="toggle-balance-btn">
+                            <span id="balance-toggle-text">Hide</span>
+                        </button>
+                    </div>
+                    <div id="deck-balance-chart" class="deck-balance-chart">
+                        <svg id="pentagon-svg" viewBox="0 0 200 200" class="pentagon-svg">
+                            <!-- Pentagon grid lines -->
+                            <g class="pentagon-grid">
+                                <!-- Will be drawn by JS -->
+                            </g>
+                            <!-- Pentagon axes -->
+                            <g class="pentagon-axes">
+                                <!-- Will be drawn by JS -->
+                            </g>
+                            <!-- Data polygon -->
+                            <polygon id="pentagon-data" class="pentagon-data" points=""></polygon>
+                            <!-- Axis labels -->
+                            <g class="pentagon-labels" id="pentagon-labels">
+                                <!-- Will be drawn by JS -->
+                            </g>
+                        </svg>
+                        <div class="balance-stats-list" id="balance-stats-list">
+                            <!-- Will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Deck Validation -->
                 <div id="deck-validation" class="error-message hidden"></div>
 
@@ -95,6 +369,31 @@
                     <button id="save-deck-btn" class="btn btn-primary" onclick="saveDeck()">Save Deck</button>
                     <button id="delete-deck-btn" class="btn btn-secondary" onclick="deleteDeck()" style="display: none;">Delete</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tag Management Modal -->
+    <div id="tag-modal-overlay" class="tag-modal-overlay hidden">
+        <div class="tag-modal">
+            <h3>Manage Tags</h3>
+            <div id="tag-modal-card-name" class="tag-modal-card-name"></div>
+
+            <div class="tag-input-row">
+                <input type="text" id="tag-input" placeholder="Add a tag..." maxlength="20">
+                <button class="btn btn-sm btn-primary" onclick="addTagFromInput()">Add</button>
+            </div>
+
+            <span class="current-tags-label">Current Tags:</span>
+            <div id="current-tags" class="current-tags"></div>
+
+            <div class="suggested-tags">
+                <span class="suggested-tags-label">Suggested Tags:</span>
+                <div id="suggested-tags" class="suggested-tags-list"></div>
+            </div>
+
+            <div class="tag-modal-actions">
+                <button class="btn btn-secondary" onclick="closeTagModal()">Close</button>
             </div>
         </div>
     </div>
